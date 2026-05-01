@@ -13,7 +13,7 @@
 	
 	<p class="lead">In order to be able to sign in using your domain name, connect it to your existing identities.</p>
 	
-	<p>You probably already have many disconnected profiles on the web. Linking between them and your domain name with the <a href="http://microformats.org/wiki/rel-me"><code>rel=me</code></a> microformat ensures that it’s easy to see that you on Google/Twitter/Github/Flickr/Facebook/email are all the same person as your domain name.</p>
+	<p>You probably already have many profiles on the web. Linking between them and your domain name with the <a href="http://microformats.org/wiki/rel-me"><code>rel=me</code></a> microformat ensures that it’s easy to see that you on Github, Flickr, <a href="https://indieweb.org/rel-me#Service_Support">other services</a>, Mastodon, <a href="https://indieweb.org/rel-me#Software_Support">other software</a>, or email are all the same person as your domain name.</p>
 	
 	<p>On the wiki: <a href="https://indieweb.org/How_to_set_up_web_sign-in_on_your_own_domain">How to set up Web Sign In</a>.</p>
 	
