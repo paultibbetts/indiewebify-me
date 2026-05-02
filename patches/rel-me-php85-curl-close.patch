@@ -1,0 +1,11 @@
+diff --git a/RelMe.php b/RelMe.php
+--- a/RelMe.php
++++ b/RelMe.php
+@@ -84,7 +84,6 @@ function httpGet($url) {
+ 	curl_setopt($ch, CURLOPT_HEADER, 1);
+ 	$response = curl_exec($ch);
+ 	$info = curl_getinfo($ch);
+-	curl_close($ch);
+ 
+ 	$rawHeaders = mb_substr($response, 0, $info['header_size']);
+ 	$headers = http_parse_headers($rawHeaders);

@@ -56,6 +56,9 @@
 			"barnabywalters/mf-cleaner": {
 				"Fix PHP 8.4 nullable parameter deprecation": "patches/mf-cleaner-php84-nullable-context.patch"
 			},
+			"indieweb/rel-me": {
+				"Fix PHP 8.5 curl_close deprecation": "patches/rel-me-php85-curl-close.patch"
+			},
 			"mf2/mf2": {
 				"Fix PHP 8.4 nullable parameter deprecations": "patches/mf2-php84-nullable-context.patch",
 				"Fix PHP 8.5 SplObjectStorage method deprecations": "patches/mf2-php85-splobjectstorage-methods.patch",
