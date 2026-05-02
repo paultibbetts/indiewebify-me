@@ -20,7 +20,7 @@ use GuzzleHttp\{
 use Mf2;
 use Mf2\Parser;
 
-final class Microformats
+class Microformats
 {
     /**
      * The core h-card properties we will look for and recommend

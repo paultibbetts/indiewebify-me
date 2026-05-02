@@ -7,6 +7,7 @@ namespace App\Controller;
 use IndieWeb;
 use App\Responder\Responder;
 use App\Service\Microformats;
+use App\Service\RelMe;
 use App\Service\ValidateHEntry;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use Mf2;
@@ -30,7 +31,8 @@ final readonly class ValidateController
     public function rel_me_check(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService
+        Microformats $mfService,
+        RelMe $relMe
     ) {
         $response_data = [
             'pass' => false,
@@ -51,7 +53,7 @@ final readonly class ValidateController
         $url2 = $this->normalizeFullUrl($url2);
         $is_url_https = (parse_url((string) $url1, PHP_URL_SCHEME) == 'https') ? true : false;
 
-        [$inbound_url, $secure, $previous] = IndieWeb\relMeDocumentUrl($url2);
+        [$inbound_url, $secure, $previous] = $relMe->documentUrl($url2);
 
         $httpResponse = $mfService->httpGet($inbound_url);
         $response_data['status'] = $httpResponse['status'];
@@ -61,10 +63,10 @@ final readonly class ValidateController
             return $this->responder->withJson($response, $response_data);
         }
 
-        $relMeLinks = IndieWeb\relMeLinks($httpResponse['body'], $inbound_url);
+        $relMeLinks = $relMe->links($httpResponse['body'], $inbound_url);
 
         foreach ($relMeLinks as $inboundRelMeUrl) {
-            [$matches, $secure, $previous] = IndieWeb\backlinkingRelMeUrlMatches($inboundRelMeUrl, $url1);
+            [$matches, $secure, $previous] = $relMe->backlinkMatches($inboundRelMeUrl, $url1);
             if ($matches) {
                 $response_data['pass'] = true;
                 $response_data['response'] = ($is_url_https && !$secure)
@@ -80,10 +82,14 @@ final readonly class ValidateController
         return $this->responder->withJson($response, $response_data);
     }
 
+    /**
+     * rel-me validator.
+     */
     public function rel_me(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService
+        Microformats $mfService,
+        RelMe $relMe
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
@@ -109,7 +115,7 @@ final readonly class ValidateController
             }
 
             # resolve any redirects and whether redirect chain is secure
-            [$url, $secure, $previous] = IndieWeb\relMeDocumentUrl($url);
+            [$url, $secure, $previous] = $relMe->documentUrl($url);
 
             if (!$secure) {
                 $error = sprintf(
@@ -134,7 +140,7 @@ final readonly class ValidateController
                 );
             }
 
-            $rels = IndieWeb\relMeLinks($httpResponse['body'], $url);
+            $rels = $relMe->links($httpResponse['body'], $url);
 
             return $this->responder->withTemplate(
                 $response,
@@ -149,6 +155,9 @@ final readonly class ValidateController
         );
     }
 
+    /**
+     * h-card validator.
+     */
     public function h_card(
         ServerRequestInterface $request,
         ResponseInterface $response,
@@ -215,6 +224,9 @@ final readonly class ValidateController
         );
     }
 
+    /**
+     * h-entry validator.
+     */
     public function h_entry(
         ServerRequestInterface $request,
         ResponseInterface $response,
