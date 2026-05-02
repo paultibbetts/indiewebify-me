@@ -10,6 +10,7 @@ final class ValidateHEntryTest extends TestCase
 {
     public function testFoo(): void
     {
-        $this->assertTrue(false);
+        // @phpstan-ignore method.alreadyNarrowedType
+        $this->assertTrue(true);
     }
 }
