@@ -211,7 +211,7 @@ final class Microformats
 
 		$name_state = null;
 		if ($core['content'] && $core['name']) {
-			$name_state = mb_strlen($core['name']) > mb_strlen($core['content'])
+			$name_state = mb_strlen((string) $core['name']) > mb_strlen((string) $core['content'])
 				? 'invalid'
 				: 'valid';
 		}
@@ -241,7 +241,7 @@ final class Microformats
 		try {
 			$dt = new DateTime($date);
 			return true;
-		} catch (Exception $e) {
+		} catch (Exception) {
 			return false;
 		}
 	}

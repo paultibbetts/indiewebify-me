@@ -18,15 +18,11 @@ use Psr\Http\Message\{
 };
 use Slim\Views\Twig;
 
-final class ValidateController
+final readonly class ValidateController
 {
-	private Responder $responder;
-
-	public function __construct(
-		Responder $responder
-	) {
-		$this->responder = $responder;
-	}
+	public function __construct(private Responder $responder)
+    {
+    }
 
 	/**
 	 * Check that url2 links back to url1 with rel=me
@@ -53,9 +49,9 @@ final class ValidateController
 
 		$url1 = $this->normalizeFullUrl($url1);
 		$url2 = $this->normalizeFullUrl($url2);
-		$is_url_https = (parse_url($url1, PHP_URL_SCHEME) == 'https') ? true : false;
+		$is_url_https = (parse_url((string) $url1, PHP_URL_SCHEME) == 'https') ? true : false;
 
-		list($inbound_url, $secure, $previous) = IndieWeb\relMeDocumentUrl($url2);
+		[$inbound_url, $secure, $previous] = IndieWeb\relMeDocumentUrl($url2);
 
 		$httpResponse = $mfService->httpGet($inbound_url);
 		$response_data['status'] = $httpResponse['status'];
@@ -68,7 +64,7 @@ final class ValidateController
 		$relMeLinks = IndieWeb\relMeLinks($httpResponse['body'], $inbound_url);
 
 		foreach ($relMeLinks as $inboundRelMeUrl) {
-			list($matches, $secure, $previous) = IndieWeb\backlinkingRelMeUrlMatches($inboundRelMeUrl, $url1);
+			[$matches, $secure, $previous] = IndieWeb\backlinkingRelMeUrlMatches($inboundRelMeUrl, $url1);
 			if ($matches) {
 				$response_data['pass'] = true;
 				$response_data['response'] = ($is_url_https && !$secure)
@@ -113,7 +109,7 @@ final class ValidateController
 			}
 
 			# resolve any redirects and whether redirect chain is secure
-			list($url, $secure, $previous) = IndieWeb\relMeDocumentUrl($url);
+			[$url, $secure, $previous] = IndieWeb\relMeDocumentUrl($url);
 
 			if (!$secure) {
 				$error = sprintf('Insecure redirect between %s and %s',

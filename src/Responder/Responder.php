@@ -17,23 +17,11 @@ use Slim\{
 };
 use function http_build_query;
 
-final class Responder
+final readonly class Responder
 {
-	private Twig $twig;
-
-	private RouteParserInterface $routeParser;
-
-	private ResponseFactoryInterface $responseFactory;
-
-	public function __construct(
-		Twig $twig,
-		RouteParserInterface $routeParser,
-		ResponseFactoryInterface $responseFactory
-	) {
-		$this->twig = $twig;
-		$this->responseFactory = $responseFactory;
-		$this->routeParser = $routeParser;
-	}
+	public function __construct(private Twig $twig, private RouteParserInterface $routeParser, private ResponseFactoryInterface $responseFactory)
+    {
+    }
 
 	/**
 	 * Create a new response.

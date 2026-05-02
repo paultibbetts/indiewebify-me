@@ -15,22 +15,14 @@ use Slim\{
 use Twig\TwigFunction;
 
 return [
-	'settings' => function () {
-		return require __DIR__ . '/settings.php';
-	},
+	'settings' => fn() => require __DIR__ . '/settings.php',
 
-	App::class => function (ContainerInterface $container) {
-		return Bridge::create($container);
-	},
+	App::class => fn(ContainerInterface $container) => Bridge::create($container),
 
-	ResponseFactoryInterface::class => function (ContainerInterface $container) {
-		return AppFactory::determineResponseFactory();
-	},
+	ResponseFactoryInterface::class => fn(ContainerInterface $container) => AppFactory::determineResponseFactory(),
 
 	// The Slim RouterParser
-	RouteParserInterface::class => function (ContainerInterface $container) {
-		return $container->get(App::class)->getRouteCollector()->getRouteParser();
-	},
+	RouteParserInterface::class => fn(ContainerInterface $container) => $container->get(App::class)->getRouteCollector()->getRouteParser(),
 
 	// Twig templates
 	Twig::class => function (ContainerInterface $container) {
@@ -49,8 +41,6 @@ return [
 		return $twig;
 	},
 
-	TwigMiddleware::class => function (ContainerInterface $container) {
-		return TwigMiddleware::createFromContainer($container->get(App::class), Twig::class);
-	},
+	TwigMiddleware::class => fn(ContainerInterface $container) => TwigMiddleware::createFromContainer($container->get(App::class), Twig::class),
 ];
 
