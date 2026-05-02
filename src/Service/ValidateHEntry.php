@@ -16,8 +16,10 @@ use Mf2\Parser;
 
 final class ValidateHEntry
 {
+    // @phpstan-ignore property.onlyWritten (kept for pending migration state)
     private array $messages = [];
 
+    // @phpstan-ignore property.onlyWritten (kept for pending migration state)
     private array $properties = [
         'name',
         'content',
