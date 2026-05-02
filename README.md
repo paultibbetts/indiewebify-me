@@ -13,6 +13,23 @@ Installation
   * If you are running Apache, do this by renaming `/public/htaccess.txt` to `/public/.htaccess`
 * Run `composer install`
 
+### Docker
+
+Install Docker first:
+* macOS: install Docker Desktop or [Colima](https://colima.run/#quick-start) (recommended).
+* Linux: install [Docker Engine](https://docs.docker.com/engine/install/), it should include the Docker Compose plugin.
+
+Then run the app:
+
+```sh
+docker compose up -d --build
+```
+
+The site will be available at [http://localhost:8080](http://localhost:8080).
+
+Set `APP_PORT` to use a different host port, for example `APP_PORT=8081 docker compose up --build`.
+You can set this in an `.env` file, copy the example to get started: `cp .env.example .env`.
+
 ## Development Notes
 
 I chose [SlimPHP Framework v4](https://www.slimframework.com/) since it feels lighter weight than alternatives like Laravel and Symfony. Slim implements several of the [PHP FIG](https://www.php-fig.org/) interop standards, which I think will make the code more portable in the future. I have developed other projects in Slim like indiebookclub.biz and some projects for work. I've found it pretty easy to work with.
@@ -39,4 +56,3 @@ The `/templates` directory has the Twig templates. The `/templates/pages` contai
 ## Credits
 
 Originally made by Brennan Novak, Barnaby Walters, and others at the 2013 IndieWebCamps in [Reykjavik](http://indieweb.org/2013/#Remote_Indiewebcamp_Parties) and [Brighton](http://indieweb.org/2013/UK).
-
