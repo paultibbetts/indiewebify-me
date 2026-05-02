@@ -17,7 +17,7 @@ use Twig\TwigFunction;
 return [
     'settings' => fn () => require __DIR__ . '/settings.php',
 
-    App::class => fn (ContainerInterface $container) => Bridge::create($container),
+    App::class => Bridge::create(...),
 
     ResponseFactoryInterface::class => fn (ContainerInterface $container) => AppFactory::determineResponseFactory(),
 
