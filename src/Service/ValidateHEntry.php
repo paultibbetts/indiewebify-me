@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validate h-entry service
  */
@@ -15,51 +16,51 @@ use Mf2\Parser;
 
 final class ValidateHEntry
 {
-	private array $messages = [];
+    private array $messages = [];
 
-	private array $properties = [
-		'name',
-		'content',
-		'author',
-		'published',
-		'url',
-		'categories',
-	];
+    private array $properties = [
+        'name',
+        'content',
+        'author',
+        'published',
+        'url',
+        'categories',
+    ];
 
-	public function __construct()
-	{}
+    public function __construct()
+    {
+    }
 
-	/**
-	 * Fetch a URL and parse for all h-entry
-	 */
-	public function findEntries(string $url): array
-	{
-		$microformats = Mf2\fetch($url, true);
-		return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
-	}
+    /**
+     * Fetch a URL and parse for all h-entry
+     */
+    public function findEntries(string $url): array
+    {
+        $microformats = Mf2\fetch($url, true);
+        return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
+    }
 
-	/**
-	 * @todo
-	 */
-	public function validate(array $entry)
-	{
-	}
+    /**
+     * @todo
+     */
+    public function validate(array $entry)
+    {
+    }
 
-	/**
-	 * @see https://indieweb.org/ptd
-	 */
-	public function getPostType(array $entry): string
-	{
-		$type = 'post';
-		if (Mf2Helper\hasProp($entry, 'in-reply-to')) {
-			$type = 'reply';
-		} elseif (Mf2Helper\hasProp($entry, 'like-of')) {
-			$type = 'like';
-		} elseif (Mf2Helper\hasProp($entry, 'repost-of')) {
-			$type = 'repost';
-		}
+    /**
+     * @see https://indieweb.org/ptd
+     */
+    public function getPostType(array $entry): string
+    {
+        $type = 'post';
+        if (Mf2Helper\hasProp($entry, 'in-reply-to')) {
+            $type = 'reply';
+        } elseif (Mf2Helper\hasProp($entry, 'like-of')) {
+            $type = 'like';
+        } elseif (Mf2Helper\hasProp($entry, 'repost-of')) {
+            $type = 'repost';
+        }
 
-		return $type;
-	}
+        return $type;
+    }
 }
-

@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App;
 
 use App\Controller\{
-	ValidateController
+    ValidateController
 };
 use Psr\Http\Message\{
-	ResponseInterface,
-	ServerRequestInterface
+    ResponseInterface,
+    ServerRequestInterface
 };
 use Slim\App;
 
 return function (App $app) {
-	$prefix = '';
+    $prefix = '';
 
-	$app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
-		$content = <<< END
+    $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
+        $content = <<< END
 <h1> Under Development </h1>
 <ul>
 	<li> <a href="/validate-rel-me">Validate rel-me</a> </li>
@@ -26,9 +26,9 @@ return function (App $app) {
 </ul>
 END;
 
-		$response->getBody()->write($content);
-		return $response;
-	});
+        $response->getBody()->write($content);
+        return $response;
+    });
 
     $app->get('/rel-me-check', [ValidateController::class, 'rel_me_check'])
         ->setName('rel_me_check');
@@ -42,4 +42,3 @@ END;
     $app->get('/validate-h-entry', [ValidateController::class, 'h_entry'])
         ->setName('validate_h_entry');
 };
-

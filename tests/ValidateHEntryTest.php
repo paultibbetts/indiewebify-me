@@ -13,4 +13,3 @@ final class ValidateHEntryTest extends TestCase
         $this->assertTrue(false);
     }
 }
-

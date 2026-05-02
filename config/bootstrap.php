@@ -23,4 +23,3 @@ $app = $container->get(App::class);
 (require __DIR__ . '/middleware.php')($app);
 
 return $app;
-

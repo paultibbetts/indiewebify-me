@@ -16,4 +16,3 @@ return function (App $app) {
 
     // $app->add(ErrorMiddleware::class);
 };
-
