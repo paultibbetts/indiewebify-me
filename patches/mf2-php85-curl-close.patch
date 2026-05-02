@@ -1,0 +1,11 @@
+diff --git a/Mf2/Parser.php b/Mf2/Parser.php
+--- a/Mf2/Parser.php
++++ b/Mf2/Parser.php
+@@ -74,7 +74,6 @@ function fetch($url, $convertClassic = true, &$curlInfo=null) {
+ 	));
+ 	$html = curl_exec($ch);
+ 	$info = $curlInfo = curl_getinfo($ch);
+-	curl_close($ch);
+ 
+ 	if (strpos(strtolower($info['content_type']), 'html') === false) {
+ 		// The content was not delivered as HTML, do not attempt to parse it.

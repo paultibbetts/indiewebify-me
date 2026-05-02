@@ -1,0 +1,12 @@
+diff --git a/src/functions.php b/src/functions.php
+--- a/src/functions.php
++++ b/src/functions.php
+@@ -269,7 +269,7 @@ function getAuthorFromHCard(array $hcard, $url, $matchName = true, $matchHostna
+  * @todo: maybe split some bits of this out into separate functions
+  *
+  */
+-function getAuthor(array $mf, array $context = null, $url = null, $matchName = true, $matchHostname = true) {
++function getAuthor(array $mf, ?array $context = null, $url = null, $matchName = true, $matchHostname = true) {
+ 	$entryAuthor = null;
+ 	
+ 	if (null === $url and hasProp($mf, 'url'))

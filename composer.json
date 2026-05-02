@@ -5,6 +5,7 @@
 	"require": {
 		"php": "^8.5",
 		"barnabywalters/mf-cleaner": "^0.2",
+		"cweagans/composer-patches": "^1.7",
 		"guzzlehttp/guzzle": "^7.0",
 		"indieweb/rel-me": "^0.1.1",
 		"mf2/mf2": "^0.5",
@@ -24,6 +25,23 @@
 	"autoload-dev": {
 		"psr-4": {
 			"App\\Tests\\": "tests/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"cweagans/composer-patches": true
+		}
+	},
+	"extra": {
+		"patches": {
+			"barnabywalters/mf-cleaner": {
+				"Fix PHP 8.4 nullable parameter deprecation": "patches/mf-cleaner-php84-nullable-context.patch"
+			},
+			"mf2/mf2": {
+				"Fix PHP 8.4 nullable parameter deprecations": "patches/mf2-php84-nullable-context.patch",
+				"Fix PHP 8.5 SplObjectStorage method deprecations": "patches/mf2-php85-splobjectstorage-methods.patch",
+				"Fix PHP 8.5 curl_close deprecation": "patches/mf2-php85-curl-close.patch"
+			}
 		}
 	}
 }
