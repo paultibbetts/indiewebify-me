@@ -10,7 +10,6 @@ final class ValidateHEntryTest extends TestCase
 {
     public function testFoo(): void
     {
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertTrue(true);
+        $this->markTestIncomplete('Validate h-entry');
     }
 }
