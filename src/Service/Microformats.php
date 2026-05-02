@@ -108,15 +108,14 @@ final class Microformats
             ]);
 
             $response = $client->get($url);
-        } catch (TransferException $e) {
-            $output['error'] = $e->getMessage();
-
         } catch (RequestException $e) {
             $output['error'] = $e->getMessage();
 
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
             }
+        } catch (TransferException $e) {
+            $output['error'] = $e->getMessage();
         }
 
         if ($response) {
