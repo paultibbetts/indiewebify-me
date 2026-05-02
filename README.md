@@ -5,19 +5,22 @@ This is an in-progress migration of the existing IndieWebify.me code from Silex 
 ## Installation
 
 Requirements:
-* PHP 8.2
+
+- PHP 8.2
 
 Installation
-* Set the domain's document root to the `/public` directory
-* Configure the server to route requests through `/public/index.php` if they don’t match a file
-  * If you are running Apache, do this by renaming `/public/htaccess.txt` to `/public/.htaccess`
-* Run `composer install`
+
+- Set the domain's document root to the `/public` directory
+- Configure the server to route requests through `/public/index.php` if they don’t match a file
+    - If you are running Apache, do this by renaming `/public/htaccess.txt` to `/public/.htaccess`
+- Run `composer install`
 
 ### Docker
 
 Install Docker first:
-* macOS: install Docker Desktop or [Colima](https://colima.run/#quick-start) (recommended).
-* Linux: install [Docker Engine](https://docs.docker.com/engine/install/), it should include the Docker Compose plugin.
+
+- macOS: install Docker Desktop or [Colima](https://colima.run/#quick-start) (recommended).
+- Linux: install [Docker Engine](https://docs.docker.com/engine/install/), it should include the Docker Compose plugin.
 
 Then run the app:
 
@@ -38,11 +41,12 @@ For templating, I've used [Twig](https://twig.symfony.com/doc/3.x/). The previou
 
 ### App structure
 
-I started with an MVC setup, though we don't currently have need for a database so I guess it's just VC (no no, not *that* kind).
+I started with an MVC setup, though we don't currently have need for a database so I guess it's just VC (no no, not _that_ kind).
 
 I used [PHP-DI](https://php-di.org/) for dependency injection, which makes it easier to inject dependencies wherever they are needed.
 
 The `/config` directory is where all the app configuration and startup happens:
+
 - bootstrap.php: build the PHP-DI container, create an instance of the Slim app, register URL routes, and register middleware
 - container.php: used for DI. This file returns an array of classes and how they're instantiated when they're injected. Not changed often, unless a custom Twig templating function needs to be added.
 - middleware.php: See Slim documentation for Middleware. Not changed often.
