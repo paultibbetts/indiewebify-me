@@ -35,7 +35,7 @@
 		"cs": "php-cs-fixer fix --dry-run --diff --format=txt",
 		"cs:fix": "php-cs-fixer fix",
 		"stan": "phpstan analyse --no-progress",
-		"test": "phpunit tests",
+		"test": "phpunit --fail-on-warning --fail-on-notice --display-warnings --display-notices tests",
 		"security:audit": "composer audit",
 		"check": [
 			"@lint",
