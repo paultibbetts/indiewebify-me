@@ -1,0 +1,42 @@
+{% extends 'layouts/generic-page-layout.twig' %}
+
+{% block bodyContent %}
+	<header>
+		<div class="demo-headline col-12">
+			<h1 class="demo-logo text-center">Indie<wbr>Webify<wbr>.Me</h1>
+			<h2 class="h4 text-secondary text-center">This is a development version of the site</h2>
+		</div>
+	</header>
+
+	<div class="row demo-row">
+		<div class="col-12">
+			<h1>What is the IndieWeb?</h1>
+
+			<blockquote class="old-bootstrap-blockquote">
+				We should all own the content we're creating, rather than just posting to third-party content silos.Publish on your own domain, and syndicate out to silos. This is the basis of the "Indie Web" movement. – <a href="https://indieweb.org" target="_blank">IndieWeb.org</a>
+			</blockquote>
+		</div>
+	</div>
+
+	<div class="row demo-row">
+		<div class="col-12">
+			<hr>
+		</div>
+	</div>
+
+	<div class="row demo-row mb-3">
+		{% include 'pages/partials/validate-rel-me.twig' %}
+	</div>
+	<div class="row demo-row mb-3">
+		{% include 'pages/partials/validate-h-card.twig' %}
+	</div>
+	<div class="row demo-row mb-3">
+		{% include 'pages/partials/validate-h-entry.twig' %}
+	</div>
+	<div class="row demo-row mb-3">
+		{% include 'pages/partials/send-webmentions.twig' %}
+	</div>
+	<div class="row demo-row mb-3">
+		{% include 'pages/partials/level-3.twig' %}
+	</div>
+{% endblock %}

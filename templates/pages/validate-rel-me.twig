@@ -1,60 +1,6 @@
 {% extends 'layouts/generic-page-layout.twig' %}
 
 {% block bodyContent %}
-
-<h1 class="my-3"> <i class="bi bi-person"></i> Become a citizen of the IndieWeb <small>Level 1</small> </h1>
-
-<h2>1. Get your own domain name</h2>
-
-<p class="lead">A personal <b>domain name</b> is an inexpensive, internationally universal identifier which gives you more control over your space than other IDs (e.g. email address or phone number.)</p>
-
-<p>On the wiki: <a href="https://indieweb.org/personal-domain">Personal Domains</a>.</p>
-
-<h2>2. Set up Web Sign In</h2>
-
-<p class="lead">In order to be able to sign in using your domain name, connect it to your existing identities.</p>
-
-<p>You probably already have many disconnected profiles on the web. Linking between them and your domain name with the <a href="http://microformats.org/wiki/rel-me"><code>rel=me</code></a> microformat ensures that it’s easy to see that you on Google/Twitter/Github/Flickr/Facebook/email are all the same person as your domain name.</p>
-
-<p>On the wiki: <a href="https://indieweb.org/How_to_set_up_web_sign-in_on_your_own_domain">How to set up Web Sign In</a>.</p>
-
-{% if error %}
-	<div class="alert alert-danger"> {{ error }} </div>
-{% endif %}
-
-{% if rels %}
-<div id="results" class="alert alert-success">
-
-	<div class="progress mb-3">
-		<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-label="Progress checking rel-me links" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 1%"></div>
-	</div>
-
-	<p> We found the following <code>rel=me</code> URLs on <a href="{{ url }}" class="results-url">{{ url }}</a> </p>
-
-	<ul>
-		{% for item_url in rels %}
-		<li class="rel-me-result">
-			<a href="{{ item_url }}">{{ item_url }}</a>
-			<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
-			<span class="badge d-none">badge text</span>
-		</li>
-		{% endfor %}
-	</ul>
-</div>
-{% endif %}
-
-<form method="get" action="{{ url_for('validate_rel_me') }}#results">
-	<div class="row g-3">
-		<div class="col">
-			<input type="text" name="url" value="{{ url }}" class="form-control" placeholder="https://example.com" required>
-		</div>
-		<div class="col">
-			<input type="submit" value="Validate rel-me" class="btn btn-primary">
-		</div>
-	</div>
-</form>
-
-<small>Want to be able to use rel-me data in your code? Check out the open source <a href="https://indieweb.org/rel-me#Implementations">implementations</a>.</small>
-
+	{% include 'pages/partials/validate-rel-me.twig' %}
 {% endblock %}
 

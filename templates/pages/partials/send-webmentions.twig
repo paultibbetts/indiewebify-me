@@ -1,0 +1,46 @@
+<h2>2. Add the ability to send <a href="https://webmention.org/" target="_blank">Webmentions</a> to other IndieWeb sites</h2>
+
+<p class="lead">When you reply to something on another indieweb site, or mention someone with an indieweb site, sending a webmention lets them know they’ve been linked to.</p>
+
+<p>Sending webmentions allows you to write replies to other content and participate in cross-site conversations. You can send webmentions by:</p>
+
+<ul>
+	<li>using the form below</li>
+	<li>using <a href="https://telegraph.p3k.io/">Telegraph</a>, which lets you choose which links to send to</li>
+	<li>from the command line <a href="https://indieweb.org/webmention-implementation-guide">using Curl</a> or <a href="https://github.com/vrypan/webmention-tools">webmention-tools</a></li>
+	<li>Make your publishing software send webmentions for you automatically using one of the <a href="https://indieweb.org/Webmention-developer#Libraries">open source libraries</a></li>
+	<li>Or, get down and dirty with the <a href="http://webmention.net">Webmention spec</a> and implement it yourself</li>
+</ul>
+
+<p>On the wiki: <a href="https://indieweb.org/webmention">webmention</a></p>
+
+{% if error %}
+	<div class="alert alert-danger">
+		<p>Something went wrong!</p>
+		<p>When sending webmentions for {{ url }}, we got this problem:</p>
+		{% if error == 'no-url' %}
+			<p>Empty URLs lead nowhere!</p>
+		{% endif %}
+		{% if error == 'no-h-entry' %}
+			<p>No h-entry was found on {{ url }}!</p>
+			<p>When you send webmentions from a page, the pages you’ve mentioned will usually fetch it and parse it for h-entry markup, to display as comments or notifications. You should <a href="/validate-h-entry/?url=<?= htmlspecialchars(urlencode(htmlspecialchars_decode($url))) ?>">mark up your posts with h-entry</a> so the people you mention can do something useful with the information.</p>
+		{% endif %}
+	</div>
+{% endif %}
+
+<form method="post" action="{{ url_for('send_webmentions_send') }}">
+	<div class="row g-3">
+		<div class="col">
+			<input type="text" name="url" id="send-webmentions-url" value="{{ url }}" class="form-control" placeholder="https://example.com" required>
+		</div>
+		<div class="col">
+			<input type="submit" value="Send mentions" class="btn btn-primary">
+		</div>
+	</div>
+</form>
+
+{% if result %}
+<div class="result alert alert-success my-4">
+	<p>Successfully sent {{ result.numSent }} webmentions from <code>{{ url }}</code></p>
+</div>
+{% endif %}
