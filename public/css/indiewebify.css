@@ -52,28 +52,3 @@
 li {
 	line-height: 1.6;
 }
-
-/* BOOTSTRAP CHANGED */
-
-.old-bootstrap-blockquote {
-	padding: 0 0 0 15px;
-	margin: 0 0 20px;
-	border-left: 5px solid #eeeeee;
-}
-
-h1 small {
-	font-weight: normal;
-}
-
-code,
-a code {
-	padding: 0.125rem 0.25rem;
-	color: #d14;
-	white-space: nowrap;
-	background-color: #f7f7f9;
-	border: 1px solid #e1e1e8;
-}
-
-ul {
-	padding-left: 2rem !important;
-}

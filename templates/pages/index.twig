@@ -4,7 +4,7 @@
 	<header>
 		<div class="demo-headline col-12">
 			<h1 class="demo-logo text-center">Indie<wbr>Webify<wbr>.Me</h1>
-			<h2 class="h4 text-secondary text-center">This is a development version of the site</h2>
+			<h2 class="h4 text-center">This is a development version of the site</h2>
 		</div>
 	</header>
 
@@ -12,7 +12,7 @@
 		<div class="col-12">
 			<h1>What is the IndieWeb?</h1>
 
-			<blockquote class="old-bootstrap-blockquote">
+			<blockquote>
 				We should all own the content we're creating, rather than just posting to third-party content silos.Publish on your own domain, and syndicate out to silos. This is the basis of the "Indie Web" movement. – <a href="https://indieweb.org" target="_blank">IndieWeb.org</a>
 			</blockquote>
 		</div>
@@ -25,18 +25,28 @@
 	</div>
 
 	<div class="row demo-row mb-3">
-		{% include 'pages/partials/validate-rel-me.twig' %}
+		<div class="col">
+			{% include 'pages/partials/validate-rel-me.twig' %}
+		</div>
 	</div>
 	<div class="row demo-row mb-3">
-		{% include 'pages/partials/validate-h-card.twig' %}
+		<div class="col">
+			{% include 'pages/partials/validate-h-card.twig' %}
+		</div>
 	</div>
 	<div class="row demo-row mb-3">
-		{% include 'pages/partials/validate-h-entry.twig' %}
+		<div class="col">
+			{% include 'pages/partials/validate-h-entry.twig' %}
+		</div>
 	</div>
 	<div class="row demo-row mb-3">
-		{% include 'pages/partials/send-webmentions.twig' %}
+		<div class="col">
+			{% include 'pages/partials/send-webmentions.twig' %}
+		</div>
 	</div>
 	<div class="row demo-row mb-3">
-		{% include 'pages/partials/federated-conversations.twig' %}
+		<div class="col">
+			{% include 'pages/partials/federated-conversations.twig' %}
+		</div>
 	</div>
 {% endblock %}
