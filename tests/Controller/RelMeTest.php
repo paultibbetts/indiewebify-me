@@ -16,12 +16,10 @@ final class RelMeTest extends WebTestCase
         $response = $this->get('/validate-rel-me');
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
+        $query = '//form[contains(@action, "/validate-rel-me")]//input[@name="url"]';
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(
-            1,
-            $xpath->query('//form[contains(@action, "/validate-rel-me")]//input[@name="url"]')->length
-        );
+        self::assertSame(1, $xpath->query($query)->length);
     }
 
     public function testRelMePageAcceptsBareDomain(): void
@@ -57,14 +55,14 @@ final class RelMeTest extends WebTestCase
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($profile)
-            ->willReturn(['file:///tmp/failed-fetch.html', true, []]);
+            ->willReturn(['file:///failed-fetch.html', true, []]);
 
         $this->app->getContainer()->set(RelMe::class, $relMe);
 
         $response = $this->get('/rel-me-check?' . http_build_query([
             'url1' => IndieWeb\normaliseUrl($website),
             'url2' => IndieWeb\normaliseUrl($profile),
-                               ]));
+        ]));
         $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(200, $response->getStatusCode());

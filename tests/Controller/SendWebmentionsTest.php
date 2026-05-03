@@ -72,7 +72,7 @@ final class SendWebmentionsTest extends WebTestCase
                 [
                     'type' => ['h-entry'],
                     'properties' => [
-                        'name' => ["Example post with 2 mentions to send"],
+                        'name' => ['Example post with 2 mentions to send'],
                     ],
                 ],
             ]);
@@ -92,7 +92,7 @@ final class SendWebmentionsTest extends WebTestCase
         $payload = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString("sent 2 webmentions", $payload);
+        self::assertStringContainsString('sent 2 webmentions', $payload);
     }
 
 }
