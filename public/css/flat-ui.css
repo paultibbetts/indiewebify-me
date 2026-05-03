@@ -361,7 +361,10 @@ blockquote {
 	border-left: 5px solid var(--bs-gray-300);
 }
 
-h1 small {
+h1 small,
+h2 small,
+h3 small,
+h4 small {
 	font-weight: normal;
 }
 
