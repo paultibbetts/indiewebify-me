@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App;
 
 use App\Controller\{
-    ValidateController
+    ValidateController,
+    WebmentionController
 };
 use Psr\Http\Message\{
     ResponseInterface,
@@ -23,6 +24,7 @@ return function (App $app) {
 	<li> <a href="/validate-rel-me">Validate rel-me</a> </li>
 	<li> <a href="/validate-h-card">Validate h-card</a> </li>
 	<li> <a href="/validate-h-entry">Validate h-entry</a> </li>
+	<li> <a href="/send-webmentions">Send webmentions</a> </li>
 </ul>
 END;
 
@@ -41,4 +43,10 @@ END;
 
     $app->get('/validate-h-entry', [ValidateController::class, 'h_entry'])
         ->setName('validate_h_entry');
+
+    $app->get('/send-webmentions', [WebmentionController::class, 'showForm'])
+        ->setName('send_webmentions');
+
+    $app->post('/send-webmentions', [WebmentionController::class, 'send'])
+        ->setName('send_webmentions_send');
 };

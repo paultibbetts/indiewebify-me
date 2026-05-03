@@ -14,7 +14,7 @@ use BarnabyWalters\Mf2 as Mf2Helper;
 use Mf2;
 use Mf2\Parser;
 
-final class ValidateHEntry
+class ValidateHEntry
 {
     // @phpstan-ignore property.onlyWritten (kept for pending migration state)
     private array $messages = [];
