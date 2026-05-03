@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
+use DI\Container;
 use DOMDocument;
 use DOMXPath;
 use PHPUnit\Framework\TestCase;
@@ -56,6 +57,17 @@ abstract class WebTestCase extends TestCase
         libxml_use_internal_errors($previous);
 
         return new DOMXPath($document);
+    }
+
+    protected function container(): Container
+    {
+        $container = $this->app->getContainer();
+
+        if (!$container instanceof Container) {
+            self::fail('Expected PHP-DI container.');
+        }
+
+        return $container;
     }
 
 }

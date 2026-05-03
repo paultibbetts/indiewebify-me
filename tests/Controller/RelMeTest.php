@@ -57,7 +57,7 @@ final class RelMeTest extends WebTestCase
             ->with($profile)
             ->willReturn(['file:///failed-fetch.html', true, []]);
 
-        $this->app->getContainer()->set(RelMe::class, $relMe);
+        $this->container()->set(RelMe::class, $relMe);
 
         $response = $this->get('/rel-me-check?' . http_build_query([
             'url1' => IndieWeb\normaliseUrl($website),
@@ -105,8 +105,8 @@ final class RelMeTest extends WebTestCase
             ->with($website, $website)
             ->willReturn([true, true, []]);
 
-        $this->app->getContainer()->set(RelMe::class, $relMe);
-        $this->app->getContainer()->set(Microformats::class, $microformats);
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Microformats::class, $microformats);
 
         $response = $this->get('/rel-me-check?' . http_build_query([
             'url1' => IndieWeb\normaliseUrl($website),

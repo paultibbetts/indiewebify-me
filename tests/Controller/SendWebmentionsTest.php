@@ -46,7 +46,7 @@ final class SendWebmentionsTest extends WebTestCase
             ->with($url)
             ->willReturn([]);
 
-        $this->app->getContainer()->set(ValidateHEntry::class, $hEntryValidator);
+        $this->container()->set(ValidateHEntry::class, $hEntryValidator);
 
         $response = $this->post('/send-webmentions', [
             'url' => $url,
@@ -82,8 +82,8 @@ final class SendWebmentionsTest extends WebTestCase
             ->with($url)
             ->willReturn(2);
 
-        $this->app->getContainer()->set(ValidateHEntry::class, $hEntryValidator);
-        $this->app->getContainer()->set(MentionSender::class, $mentionSender);
+        $this->container()->set(ValidateHEntry::class, $hEntryValidator);
+        $this->container()->set(MentionSender::class, $mentionSender);
 
         $response = $this->post('/send-webmentions', [
             'url' => $url,
