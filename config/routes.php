@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Controller\{
-    IndexController,
+    PageController,
     ValidateController,
     WebmentionController
 };
@@ -14,7 +14,7 @@ use Slim\App;
 return function (App $app) {
     $prefix = '';
 
-    $app->get('/', [IndexController::class, 'show'])
+    $app->get('/', [PageController::class, 'index'])
         ->setName('index');
 
     $app->get('/rel-me-check', [ValidateController::class, 'rel_me_check'])
@@ -34,4 +34,8 @@ return function (App $app) {
 
     $app->post('/send-webmentions', [WebmentionController::class, 'send'])
         ->setName('send_webmentions_send');
+
+    $app->get('/federated-conversations', [PageController::class, 'federatedConversations'])
+        ->setName('federated_conversations');
+
 };

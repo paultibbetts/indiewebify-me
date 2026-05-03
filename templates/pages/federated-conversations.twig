@@ -1,9 +1,10 @@
 {% extends 'layouts/generic-page-layout.twig' %}
 
 {% block bodyContent %}
-	{% include 'pages/partials/send-webmentions.twig' %}
+	{% include 'pages/partials/federated-conversations.twig' %}
 	{% include 'pages/partials/pagination.twig' with {
-		previous: 'validate-h-entry',
-		next: 'federated-conversations'
+		previous: 'send-webmentions',
 	} %}
 {% endblock %}
+
+

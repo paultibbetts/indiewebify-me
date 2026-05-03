@@ -2,5 +2,7 @@
 
 {% block bodyContent %}
 	{% include 'pages/partials/validate-rel-me.twig' %}
+	{% include 'pages/partials/pagination.twig' with {
+		next: 'validate-h-card'
+	} %}
 {% endblock %}
-

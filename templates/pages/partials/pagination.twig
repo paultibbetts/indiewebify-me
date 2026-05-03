@@ -1,0 +1,10 @@
+<hr/>
+<p>
+	{% if previous %}
+	<a href="/{{ previous }}">Previous Step</a> |
+	{% endif %}
+	<a href="/">Home</a>
+	{% if next %}|
+	<a href="/{{ next }}">Next Step</a>
+	{% endif %}
+</p>

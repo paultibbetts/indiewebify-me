@@ -2,5 +2,8 @@
 
 {% block bodyContent %}
 	{% include 'pages/partials/validate-h-entry.twig' %}
+	{% include 'pages/partials/pagination.twig' with {
+		previous: 'validate-h-card',
+		next: 'send-webmentions'
+	} %}
 {% endblock %}
-

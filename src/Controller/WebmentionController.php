@@ -69,7 +69,7 @@ final readonly class WebmentionController
                 'send-webmentions.twig',
                 [
                     'url' => $url,
-                    'error' => 'no-h-entry'
+                    'error' => 'no-h-entry',
                 ]
             );
         }

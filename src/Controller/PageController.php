@@ -10,16 +10,16 @@ use Psr\Http\Message\{
     ServerRequestInterface,
 };
 
-final readonly class IndexController
+final readonly class PageController
 {
     public function __construct(private Responder $responder)
     {
     }
 
     /**
-     * Check that url2 links back to url1 with rel=me
+     * Index page.
      */
-    public function show(
+    public function index(
         ServerRequestInterface $request,
         ResponseInterface $response,
     ) {
@@ -28,5 +28,17 @@ final readonly class IndexController
             'index.twig'
         );
     }
-}
 
+    /**
+     * Federated conversations page.
+     */
+    public function federatedConversations(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+    ) {
+        return $this->responder->withTemplate(
+            $response,
+            'federated-conversations.twig'
+        );
+    }
+}
