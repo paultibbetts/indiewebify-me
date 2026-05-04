@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use IndieWeb;
 use App\Responder\Responder;
-use App\Service\Microformats;
 use App\Service\MentionSender;
-use App\Service\RelMe;
 use App\Service\ValidateHEntry;
-use BarnabyWalters\Mf2 as Mf2Helper;
-use Mf2;
-use Mf2\Parser;
 use Psr\Http\Message\{
     ResponseInterface,
-    ServerRequestInterface,
-    StreamInterface
+    ServerRequestInterface
 };
-use Slim\Views\Twig;
 
 final readonly class WebmentionController
 {

@@ -18,7 +18,6 @@ use GuzzleHttp\{
     RequestOptions
 };
 use Mf2;
-use Mf2\Parser;
 
 class Microformats
 {

@@ -8,11 +8,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use DateTime;
-use Exception;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use Mf2;
-use Mf2\Parser;
 
 class ValidateHEntry
 {

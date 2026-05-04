@@ -9,15 +9,10 @@ use App\Responder\Responder;
 use App\Service\Microformats;
 use App\Service\RelMe;
 use App\Service\ValidateHEntry;
-use BarnabyWalters\Mf2 as Mf2Helper;
-use Mf2;
-use Mf2\Parser;
 use Psr\Http\Message\{
     ResponseInterface,
-    ServerRequestInterface,
-    StreamInterface
+    ServerRequestInterface
 };
-use Slim\Views\Twig;
 
 final readonly class ValidateController
 {
