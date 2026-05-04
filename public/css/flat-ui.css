@@ -28,8 +28,8 @@
 	--flat-gray-800: #2c3e50;
 	--flat-gray-900: #2c3e50;
 
-	--flat-font-sans-serif: "Lato", Helvetica, Arial, sans-serif;
-	--flat-font-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
+	--flat-font-sans-serif: "Lato", helvetica, arial, sans-serif;
+	--flat-font-monospace: monaco, menlo, consolas, "Courier New", monospace;
 	--flat-body-font-size: 1.125rem;
 	--flat-body-font-weight: 400;
 	--flat-body-line-height: 1.6;
@@ -39,7 +39,7 @@
 	--flat-body-bg-rgb: 255, 255, 255;
 	--flat-border-width: 2px;
 	--flat-border-color: var(--flat-gray-300);
-	--flat-border-color-translucent: rgba(52, 73, 94, 0.175);
+	--flat-border-color-translucent: rgb(52 73 94 / 17.5%);
 	--flat-border-radius: 6px;
 	--flat-border-radius-sm: 3px;
 	--flat-border-radius-xl: 7px;
@@ -61,9 +61,8 @@
 	--flat-black-rgb: 0, 0, 0;
 
 	--flat-btn-color: var(--flat-white);
-	--flat-btn-active-color: rgba(255, 255, 255, 0.75);
-	--flat-btn-disabled-color: rgba(255, 255, 255, 0.75);
-
+	--flat-btn-active-color: rgb(255 255 255 / 75%);
+	--flat-btn-disabled-color: rgb(255 255 255 / 75%);
 	--flat-btn-primary-bg: var(--flat-primary);
 	--flat-btn-primary-hover-bg: #1c9375;
 	--flat-btn-primary-focus-shadow-rgb: 28, 147, 117;
@@ -100,11 +99,9 @@
 	--flat-h4-font-weight: 500;
 	--flat-h5-font-weight: 500;
 	--flat-h6-font-weight: 500;
-}
 
-/* apply Flat UI to Tailwind 5 */
+	/* apply Flat UI to Tailwind 5 */
 
-:root {
 	--bs-blue: var(--flat-blue);
 	--bs-indigo: var(--flat-indigo);
 	--bs-purple: var(--flat-purple);
@@ -201,7 +198,6 @@ a {
 	font-weight: 700;
 	text-decoration: underline;
 	transition: 0.25s;
-	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
 
