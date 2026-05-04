@@ -17,6 +17,8 @@ Installation
 
 ### Docker
 
+You can alternatively run this using Docker.
+
 Install Docker first:
 
 - macOS: install Docker Desktop or [Colima](https://colima.run/#quick-start) (recommended).
@@ -25,13 +27,33 @@ Install Docker first:
 Then run the app:
 
 ```sh
-docker compose up -d --build
+docker compose up -d
 ```
 
 The site will be available at [http://localhost:8080](http://localhost:8080).
 
 Set `APP_PORT` to use a different host port, for example `APP_PORT=8081 docker compose up --build`.
 You can set this in an `.env` file, copy the example to get started: `cp .env.example .env`.
+
+The compose setup will mount the local directories into the container so changes to code are synced.
+
+If you change any of the following:
+
+```
+Dockerfile
+composer.json
+composer.lock
+patches/
+docker/apache/000-default.conf
+```
+
+Then you should run
+
+```sh
+docker compose up -d --build
+```
+
+so the changes are included in the container.
 
 ## Development Notes
 
