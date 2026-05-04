@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Responder\Responder;
 use Psr\Http\Message\{
     ResponseInterface,
-    ServerRequestInterface,
 };
 
 final readonly class PageController
@@ -20,7 +19,6 @@ final readonly class PageController
      * Index page.
      */
     public function index(
-        ServerRequestInterface $request,
         ResponseInterface $response,
     ) {
         return $this->responder->withTemplate(
@@ -33,7 +31,6 @@ final readonly class PageController
      * Federated conversations page.
      */
     public function federatedConversations(
-        ServerRequestInterface $request,
         ResponseInterface $response,
     ) {
         return $this->responder->withTemplate(

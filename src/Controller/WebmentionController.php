@@ -22,7 +22,6 @@ final readonly class WebmentionController
      * Shows the send webmentions form.
      */
     public function showForm(
-        ServerRequestInterface $request,
         ResponseInterface $response,
     ) {
         return $this->responder->withTemplate(
