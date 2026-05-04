@@ -6,7 +6,7 @@ This is an in-progress migration of the existing IndieWebify.me code from Silex 
 
 Requirements:
 
-- PHP 8.2
+- PHP 8.5
 
 Installation
 
@@ -57,6 +57,8 @@ so the changes are included in the container.
 
 ## Development Notes
 
+> written by Gregor
+
 I chose [SlimPHP Framework v4](https://www.slimframework.com/) since it feels lighter weight than alternatives like Laravel and Symfony. Slim implements several of the [PHP FIG](https://www.php-fig.org/) interop standards, which I think will make the code more portable in the future. I have developed other projects in Slim like indiebookclub.biz and some projects for work. I've found it pretty easy to work with.
 
 For templating, I've used [Twig](https://twig.symfony.com/doc/3.x/). The previous version of indiewebify.me has some complex conditional logic in the PHP templates, so one of my goals was to split off as much of that possible into the Slim app instad of in templates. I also like the auto-escaping that Twig offers.
@@ -78,6 +80,66 @@ The `/config` directory is where all the app configuration and startup happens:
 The `/src` directory has the bulk of the app code. The folders and filenames in there follow [PSR-4](https://www.php-fig.org/psr/psr-4/) so they can be autoloaded. Currently these directories are `Controllers`, `Responder`, and `Service` since that was the design pattern I was following. Or, uh, hybrid design pattern? :) My point being, it's fine to use different naming schemes for the folders as long as it logically follows the design pattern you're using, and the classes within them use corresponding namespaces.
 
 The `/templates` directory has the Twig templates. The `/templates/pages` contains individual page templates. I followed this blog post for setting up the template file structure: https://nystudio107.com/blog/an-effective-twig-base-templating-setup
+
+### Further migration work
+
+> written by Paul
+
+After reading a message Gregor posted in the #indieweb-dev channel, I ([paultibbetts.uk](https://paultibbetts.uk/)) spent this weekend continuing the migration.
+
+My aims are:
+
+- migrate indiewebify-me to a maintained PHP framework
+- update to the latest version of PHP
+- make it easier for new contributors to get this up and running on their machine
+- create a test suite
+- - to verify this migration is feature-complete
+- - to provide guardrails for new contributors
+- maintain frontend styling so it doesn't look any different to before
+- make indiewebify-me a good target for a future [IndieWeb Hackathon](https://indieweb.org/IndieWeb_Hackathon#Requested_Projects)
+
+I am not aiming to add new features or fix any of the (currently) 50 issues open on the repo, but I would like this migration to make it easier for future work to happen that does do those things.
+
+#### Progress so far
+
+- add composer.json
+- update to PHP 8.5
+- - repo currently includes patches for dependencies not updated yet
+- - I will submit these patches as PRs closer to completion
+- add tooling to aid migration
+- - see scripts in composer.json
+- add a docker compose setup for local development
+- - this is really simple right now
+- - and is not intended for production
+- port Flat UI to a Bootstrap 5 theme
+- - not perfect, but (mostly) maintains previous style
+- - changing the frontend is not a goal of this migration
+- - - but facilitating a potential future change is
+- add the index page back
+- ported /send-webmentions from the old version
+- add the "pagination" back
+- - accidentally fixed level 3 not being included in the pagination
+- started a test suite
+- - /validate-rel-me
+- - /send-webmentions
+- fixed a few minor errors with the original version
+- - typos and whitespace
+- - removed mention of `rel="in-reply-to"` (#97)
+
+See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration...paultibbetts:indiewebify-me:slim-migration) for all changes.
+
+#### Planned
+
+- [ ] finish validate-h-entry
+- - with minimal post type discovery
+- [ ] tests for validate-h-card
+- [ ] tests for validate-h-entry
+- [ ] tests for index page
+- [ ] tests for edge-cases
+- [ ] ensure frontend matches old version as much as possible
+- [ ] beginner-friendly documentation
+- [ ] merge into indieweb/indiewebify-me
+- [ ] host an IndieWeb Hackathon?
 
 ## Credits
 
