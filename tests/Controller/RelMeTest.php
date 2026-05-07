@@ -121,8 +121,38 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMePageShowsFetchError(): void
     {
-        // TODO: mock this scenario
-        $this->markTestIncomplete('Cover HTTP fetch failures for the rel-me document URL.');
+        $url = 'https://example.com/';
+        $error = "The site {$url} returned 500 Internal Server Error when we tried to fetch it.";
+
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl'])
+            ->getMock();
+        $microformats = $this->createMock(Microformats::class);
+
+        $relMe->expects(self::once())
+            ->method('documentUrl')
+            ->with($url)
+            ->willReturn([$url, true, []]);
+        $microformats->expects(self::once())
+            ->method('httpGet')
+            ->with($url)
+            ->willReturn([
+                'status' => 500,
+                'body' => '',
+                'error' => $error,
+                'redirects' => [],
+            ]);
+
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Microformats::class, $microformats);
+
+        $response = $this->get('/validate-rel-me?' . http_build_query([
+            'url' => $url,
+        ]));
+        $payload = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString($error, $payload);
     }
 
     public function testRelMePageShowsNoRelMeLinksError(): void
