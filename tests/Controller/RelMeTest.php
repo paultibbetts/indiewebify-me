@@ -192,8 +192,43 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMeCheckFailsWhenBacklinkIsMissing(): void
     {
-        // TODO: mock page with rel-me links pointing to something that does not link back
-        $this->markTestIncomplete('Cover a profile URL that does not link back to the submitted site.');
+        $website = 'https://example.com/';
+        $profile = 'https://bsky.app/example';
+        $inValidBacklink = '<a href="' . $website . '">Website</a>';
+
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl', 'backlinkMatches'])
+            ->getMock();
+        $microformats = $this->createMock(Microformats::class);
+
+        $relMe->expects(self::once())
+            ->method('documentUrl')
+            ->with($profile)
+            ->willReturn([$profile, true, []]);
+        $microformats->expects(self::once())
+            ->method('httpGet')
+            ->with($profile)
+            ->willReturn([
+                'status' => 200,
+                'body' => $inValidBacklink,
+                'error' => null,
+                'redirects' => [],
+            ]);
+
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Microformats::class, $microformats);
+
+        $response = $this->get('/rel-me-check?' . http_build_query([
+            'url1' => $website,
+            'url2' => $profile,
+        ]));
+        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $payload['status']);
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('Does not link back with rel=me', $payload['response']);
+        self::assertFalse($payload['pass']);
     }
 
     public function testRelMeCheckReportsInsecureBacklink(): void
