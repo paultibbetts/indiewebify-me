@@ -37,6 +37,24 @@ abstract class WebTestCase extends TestCase
         return $this->app->handle($request);
     }
 
+    protected function getFollowingRedirects(string $uri, int $limit = 5): ResponseInterface
+    {
+        $response = $this->get($uri);
+
+        while (
+            $limit > 0
+                && $response->getStatusCode() >= 300
+                && $response->getStatusCode() < 400
+                && $response->hasHeader('Location')
+        ) {
+            $uri = $response->getHeaderLine('Location');
+            $response = $this->get($uri);
+            $limit--;
+        }
+
+        return $response;
+    }
+
     protected function post(string $uri, array $data = []): ResponseInterface
     {
         $request = new ServerRequestFactory()
