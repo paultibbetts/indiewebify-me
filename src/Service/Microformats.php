@@ -120,9 +120,11 @@ class Microformats
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                 );
+            } else {
+                $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
             }
         } catch (TransferException $e) {
-            $output['error'] = $e->getMessage();
+            $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
         }
 
         if ($response instanceof \Psr\Http\Message\ResponseInterface) {
