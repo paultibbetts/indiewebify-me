@@ -127,8 +127,37 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMePageShowsNoRelMeLinksError(): void
     {
-        // TODO: show no links could be found on website
-        $this->markTestIncomplete('Cover successful fetches that contain no rel=me links.');
+        $url = 'https://example.com/';
+
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl'])
+            ->getMock();
+        $microformats = $this->createMock(Microformats::class);
+
+        $relMe->expects(self::once())
+            ->method('documentUrl')
+            ->with($url)
+            ->willReturn([$url, true, []]);
+        $microformats->expects(self::once())
+            ->method('httpGet')
+            ->with($url)
+            ->willReturn([
+                'status' => 200,
+                'body' => '<html>This is an example website with no rel-me links on it.</html>',
+                'error' => null,
+                'redirects' => [],
+            ]);
+
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Microformats::class, $microformats);
+
+        $response = $this->get('/validate-rel-me?' . http_build_query([
+            'url' => $url,
+        ]));
+        $payload = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString("No <code>rel=\"me\"</code> links could be found on {$url}.", $payload);
     }
 
     public function testRelMeCheckFailsWhenBacklinkIsMissing(): void
