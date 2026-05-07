@@ -21,7 +21,7 @@ final class HCardTest extends WebTestCase
         self::assertSame(1, $xpath->query($query)->length);
     }
 
-    public function testHCardPageRequiresADomain(): void
+    public function testHCardPageRequiresAUrl(): void
     {
         $response = $this->get('/validate-h-card?' . http_build_query([
             'url' => '',
