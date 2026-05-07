@@ -16,9 +16,7 @@
 
 {% if error %}
 	<div class="alert alert-danger"> {{ error }} </div>
-{% endif %}
-
-{% if rels %}
+{% elseif rels %}
 <div id="results" class="alert alert-success">
 
 	<div class="progress mb-3">
@@ -37,7 +35,7 @@
 		{% endfor %}
 	</ul>
 </div>
-{% elseif url != "" and not error %}
+{% elseif url != "" %}
 	<div class="alert alert-warning">
 		{# TODO: write content #}
 		No <code>rel="me"</code> links could be found on {{ url }}
