@@ -54,7 +54,7 @@ final readonly class WebmentionController
         }
 
         $entries = $hEntryValidator->findEntries($url);
-        if (!$entries) {
+        if ($entries === []) {
             return $this->responder->withTemplate(
                 $response,
                 'send-webmentions.twig',

@@ -125,7 +125,7 @@ class Microformats
             $output['error'] = $e->getMessage();
         }
 
-        if ($response) {
+        if ($response instanceof \Psr\Http\Message\ResponseInterface) {
             $output['status'] = $response->getStatusCode();
             $output['body'] = (string) $response->getBody();
 
@@ -140,7 +140,7 @@ class Microformats
             array_unshift($redirectHistory, $url);
 
             // Add the final HTTP status code to the end of HTTP response history
-            array_push($redirectStatus, $response->getStatusCode());
+            $redirectStatus[] = $response->getStatusCode();
 
             $redirects = [];
             foreach ($redirectHistory as $key => $value) {
@@ -167,7 +167,7 @@ class Microformats
         try {
             return Mf2\parse($response['body'], $url, convertClassic: true);
         } catch (Throwable $e) {
-            throw new RuntimeException('Could not parse page.', previous: $e);
+            throw new RuntimeException('Could not parse page.', $e->getCode(), previous: $e);
         }
     }
 
@@ -184,7 +184,7 @@ class Microformats
         $cards = Mf2Helper\findMicroformatsByType($microformats, 'h-card');
         $representative = Mf2Helper\getRepresentativeHCard($microformats, $url);
 
-        return compact('cards', 'representative');
+        return ['cards' => $cards, 'representative' => $representative];
     }
 
     /**
@@ -215,7 +215,7 @@ class Microformats
         $core = array_filter($core);
         $additional = array_filter($additional);
 
-        return compact('core', 'additional');
+        return ['core' => $core, 'additional' => $additional];
     }
 
     public function parseHEntryProperties(array $h_entry): array
@@ -283,10 +283,10 @@ class Microformats
             $photo = Mf2Helper\getPlaintext($author, 'photo');
             $url = Mf2Helper\getPlaintext($author, 'url');
 
-            return compact('name', 'photo', 'url', 'is_h_card');
+            return ['name' => $name, 'photo' => $photo, 'url' => $url, 'is_h_card' => $is_h_card];
         } elseif (is_string($author)) {
             $name = $author;
-            return compact('name', 'is_h_card');
+            return ['name' => $name, 'is_h_card' => $is_h_card];
         }
 
         return null;
@@ -309,7 +309,7 @@ class Microformats
                 $url = $item;
             }
 
-            $response[] = compact('url', 'is_microformat', 'is_h_cite');
+            $response[] = ['url' => $url, 'is_microformat' => $is_microformat, 'is_h_cite' => $is_h_cite];
         }
 
         return $response;

@@ -47,7 +47,7 @@ final readonly class ValidateController
 
         $url1 = $this->normalizeFullUrl($url1);
         $url2 = $this->normalizeFullUrl($url2);
-        $is_url_https = (parse_url((string) $url1, PHP_URL_SCHEME) == 'https') ? true : false;
+        $is_url_https = parse_url((string) $url1, PHP_URL_SCHEME) == 'https';
 
         [$inbound_url, $secure, $previous] = $relMe->documentUrl($url2);
 
@@ -106,7 +106,7 @@ final readonly class ValidateController
                     $response,
                     'validate_rel_me',
                     [],
-                    compact('url')
+                    ['url' => $url]
                 );
             }
 
@@ -122,7 +122,7 @@ final readonly class ValidateController
                 return $this->responder->withTemplate(
                     $response,
                     'validate-rel-me.twig',
-                    compact('url', 'error')
+                    ['url' => $url, 'error' => $error]
                 );
             }
 
@@ -132,7 +132,7 @@ final readonly class ValidateController
                 return $this->responder->withTemplate(
                     $response,
                     'validate-rel-me.twig',
-                    compact('url', 'error')
+                    ['url' => $url, 'error' => $error]
                 );
             }
 
@@ -141,7 +141,7 @@ final readonly class ValidateController
             return $this->responder->withTemplate(
                 $response,
                 'validate-rel-me.twig',
-                compact('url', 'rels')
+                ['url' => $url, 'rels' => $rels]
             );
         }
 
@@ -183,7 +183,7 @@ final readonly class ValidateController
                     $response,
                     'validate_h_card',
                     [],
-                    compact('url')
+                    ['url' => $url]
                 );
             }
 
@@ -201,7 +201,7 @@ final readonly class ValidateController
                 );
             }
 
-            if (!($cards_response['cards'] || $cards_response['representative'])) {
+            if (!$cards_response['cards'] && !$cards_response['representative']) {
                 return $this->responder->withTemplate(
                     $response,
                     'validate-h-card.twig',
@@ -269,7 +269,7 @@ final readonly class ValidateController
                     $response,
                     'validate_h_entry',
                     [],
-                    compact('url')
+                    ['url' => $url]
                 );
             }
 
@@ -284,12 +284,12 @@ final readonly class ValidateController
 
             ## parse h-entries
             $entries = $validator->findEntries($url);
-            if (!$entries) {
+            if ($entries === []) {
                 $error = 'No h-entry was found on that page';
                 return $this->responder->withTemplate(
                     $response,
                     'validate-h-entry.twig',
-                    compact('url', 'error')
+                    ['url' => $url, 'error' => $error]
                 );
             }
 
@@ -304,12 +304,7 @@ final readonly class ValidateController
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-entry.twig',
-                compact(
-                    'showResult',
-                    'properties',
-                    'postType',
-                    'url'
-                )
+                ['showResult' => $showResult, 'properties' => $properties, 'postType' => $postType, 'url' => $url]
             );
         }
 
@@ -329,7 +324,7 @@ final readonly class ValidateController
     {
         $starts_http = stripos($url, 'http://') === 0;
         $starts_https = stripos($url, 'https://') === 0;
-        if (!($starts_http || $starts_https)) {
+        if (!$starts_http && !$starts_https) {
             $url = 'http://' . $url;
         }
 
