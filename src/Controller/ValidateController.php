@@ -13,6 +13,7 @@ use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface
 };
+use RuntimeException;
 
 final readonly class ValidateController
 {
@@ -160,6 +161,18 @@ final readonly class ValidateController
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
+        if ($input_url === '') {
+            $error = 'Empty URLs lead nowhere!';
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-card.twig',
+                [
+                    'error' => $error,
+                ]
+            );
+
+        }
+
         if ($input_url) {
             # validate h-card for URL in query parameter
             $url = $this->normalizeFullUrl($input_url);
@@ -176,14 +189,30 @@ final readonly class ValidateController
 
             ## parse h-cards
 
-            $cards_response = $mfService->findHCards($url);
-
-            if (!($cards_response['cards'] || $cards_response['representative'])) {
-                $error = 'No h-card was found on that page';
+            try {
+                $cards_response = $mfService->findHCards($url);
+            } catch (RuntimeException $e) {
                 return $this->responder->withTemplate(
                     $response,
                     'validate-h-card.twig',
-                    compact('url', 'error')
+                    [
+                        'error' => $e->getMessage(),
+                    ]
+                );
+            }
+
+            if (!($cards_response['cards'] || $cards_response['representative'])) {
+                return $this->responder->withTemplate(
+                    $response,
+                    'validate-h-card.twig',
+                    [
+                        'url' => $url,
+                        'showResult' => true,
+                        'core' => [],
+                        'additional' => [],
+                        'cards' => [],
+                        'representative' => [],
+                    ]
                 );
             }
 

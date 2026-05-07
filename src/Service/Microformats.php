@@ -18,6 +18,8 @@ use GuzzleHttp\{
     RequestOptions
 };
 use Mf2;
+use RuntimeException;
+use Throwable;
 
 class Microformats
 {
@@ -112,6 +114,12 @@ class Microformats
 
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
+                $output['error'] = sprintf(
+                    'The site %s returned %d %s when we tried to fetch it.',
+                    $url,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                );
             }
         } catch (TransferException $e) {
             $output['error'] = $e->getMessage();
@@ -148,6 +156,21 @@ class Microformats
         return $output;
     }
 
+    public function fetch(string $url): array
+    {
+        $response = $this->httpGet($url);
+
+        if ($response['error']) {
+            throw new RuntimeException($response['error']);
+        }
+
+        try {
+            return Mf2\parse($response['body'], $url, convertClassic: true);
+        } catch (Throwable $e) {
+            throw new RuntimeException('Could not parse page.', previous: $e);
+        }
+    }
+
     /**
      * Fetch a URL and parse for h-card
      * Return an array with index `represntative` that has
@@ -157,7 +180,7 @@ class Microformats
      */
     public function findHCards(string $url): array
     {
-        $microformats = Mf2\fetch($url, true);
+        $microformats = $this->fetch($url);
         $cards = Mf2Helper\findMicroformatsByType($microformats, 'h-card');
         $representative = Mf2Helper\getRepresentativeHCard($microformats, $url);
 
