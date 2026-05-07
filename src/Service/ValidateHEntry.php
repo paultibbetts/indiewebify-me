@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use BarnabyWalters\Mf2 as Mf2Helper;
-use Mf2;
+use App\Service\Microformats;
 
 class ValidateHEntry
 {
@@ -26,24 +26,32 @@ class ValidateHEntry
         'categories',
     ];
 
-    public function __construct()
+    public function __construct(private Microformats $microformats)
     {
-    }
-
-    /**
-     * Fetch a URL and parse for all h-entry
-     */
-    public function findEntries(string $url): array
-    {
-        $microformats = Mf2\fetch($url, true);
-        return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
     }
 
     /**
      * @todo
      */
-    public function validate(array $entry)
+    public function validate(string $url): array
     {
+        $entries = $this->microformats->findHEntries($url);
+
+        if ($entries === []) {
+            return [
+                'entries' => [],
+                'postType' => null,
+                'properties' => [],
+            ];
+        }
+
+        $entry = $entries[0];
+
+        return [
+            'entries' => $entries,
+            'postType' => $this->getPostType($entry),
+            'properties' => $this->microformats->parseHEntryProperties($entry),
+        ];
     }
 
     /**

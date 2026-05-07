@@ -194,7 +194,7 @@ class Microformats
      */
     public function findHEntries(string $url): array
     {
-        $microformats = Mf2\fetch($url, true);
+        $microformats = $this->fetch($url);
         return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
     }
 

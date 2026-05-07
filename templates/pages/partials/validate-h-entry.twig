@@ -45,8 +45,9 @@
         <div class="my-2">
             <b class="d-block">Author Photo:</b>
             {% if properties.author.photo %}
-                <div class="w-50"> <img src="{{ properties.author.photo }}" alt="" class="mw-100"> </div>
-                {# <img src="{{ parsed.author.photo }}" alt=""> #}
+                <div class="w-50">
+					<img src="{{ properties.author.photo }}" alt="" class="mw-100">
+				</div>
             {% else %}
                 <i class="d-block">Add a photo inside the author h-card!</i>
                 <code>&lt;img class="u-photo" src="…"></code>
@@ -127,7 +128,7 @@
     <div class="my-2">
         <b class="d-block">URL:</b>
         {% if properties.url %}
-            {{ properties.url }}
+            <a href="{{ properties.url }}">{{ properties.url }}</a>
         {% else %}
             <i class="d-block">Add the post URL:</i>
             <code class="d-block">&lt;a class="u-url" href="…">…&lt;/a></code>

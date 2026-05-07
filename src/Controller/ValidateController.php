@@ -170,7 +170,6 @@ final readonly class ValidateController
                     'error' => $error,
                 ]
             );
-
         }
 
         if (!$input_url) {
@@ -254,10 +253,19 @@ final readonly class ValidateController
     public function h_entry(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService,
         ValidateHEntry $validator
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
+
+        if ($input_url === '') {
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-entry.twig',
+                [
+                    'error' => 'Empty URLs lead nowhere!',
+                ]
+            );
+        }
 
         if (!$input_url) {
             return $this->responder->withTemplate(
@@ -274,43 +282,43 @@ final readonly class ValidateController
             return $this->responder->withRedirectFor(
                 $response,
                 'validate_h_entry',
-                [],
-                ['url' => $url]
+                data: [],
+                queryParams: ['url' => $url]
             );
         }
 
-        /**
-         * Note: below code was initially using the Microformats
-         * Service class, but I later started switching to a separate
-         * validator service for each type, e.g. ValidatorHEntry.
-         * -- Gregor Morrill 2024-12-08
-         *
-         * @todo finish migrating service
-         */
-
-        ## parse h-entries
-        $entries = $validator->findEntries($url);
-        if ($entries === []) {
-            $error = 'No h-entry was found on that page';
+        try {
+            $result = $validator->validate($url);
+        } catch (RuntimeException $e) {
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-entry.twig',
-                ['url' => $url, 'error' => $error]
+                [
+                    'error' => $e->getMessage(),
+                ]
             );
         }
 
-        $entry = $entries[0];
-        $postType = $validator->getPostType($entry);
-
-        $properties = $mfService->parseHEntryProperties($entry);
-
-        // @todo
-        $showResult = true;
+        if ($result['entries'] === []) {
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-entry.twig',
+                [
+                    'url' => $url,
+                    'error' => 'No h-entry was found on that page',
+                ]
+            );
+        }
 
         return $this->responder->withTemplate(
             $response,
             'validate-h-entry.twig',
-            ['showResult' => $showResult, 'properties' => $properties, 'postType' => $postType, 'url' => $url]
+            [
+                'showResult' => true,
+                'properties' => $result['properties'],
+                'postType' => $result['postType'],
+                'url' => $url,
+            ]
         );
     }
 
