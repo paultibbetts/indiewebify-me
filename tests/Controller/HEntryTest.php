@@ -112,11 +112,28 @@ final class HEntryTest extends WebTestCase
 
     public function testHEntryPageShowsNoHEntryError(): void
     {
-        $this->markTestIncomplete('Cover pages where no h-entry is found.');
-    }
+        $url = 'https://example.com/';
 
-    public function testHEntryPageCoversIncludesPostType(): void
-    {
-        $this->markTestIncomplete('Cover h-entry post-types.');
+        $result = [
+            'entries' => [],
+        ];
+
+        $validator = $this->createMock(ValidateHEntry::class);
+
+        $validator->expects(self::once())
+            ->method('validate')
+            ->with($url)
+            ->willReturn($result);
+
+        $this->container()->set(ValidateHEntry::class, $validator);
+
+        $response = $this->get('/validate-h-entry?' . http_build_query([
+            'url' => $url,
+        ]));
+
+        $payload = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('No h-entry was found on that page', $payload);
     }
 }
