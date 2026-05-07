@@ -173,78 +173,78 @@ final readonly class ValidateController
 
         }
 
-        if ($input_url) {
-            # validate h-card for URL in query parameter
-            $url = $this->normalizeFullUrl($input_url);
+        if (!$input_url) {
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-card.twig'
+            );
 
-            if ($input_url !== $url) {
-                # ensure normalized URL in query parameter by redirecting
-                return $this->responder->withRedirectFor(
-                    $response,
-                    'validate_h_card',
-                    [],
-                    ['url' => $url]
-                );
-            }
+        }
+        # validate h-card for URL in query parameter
+        $url = $this->normalizeFullUrl($input_url);
 
-            ## parse h-cards
+        if ($input_url !== $url) {
+            # ensure normalized URL in query parameter by redirecting
+            return $this->responder->withRedirectFor(
+                $response,
+                'validate_h_card',
+                [],
+                ['url' => $url]
+            );
+        }
 
-            try {
-                $cards_response = $mfService->findHCards($url);
-            } catch (RuntimeException $e) {
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-h-card.twig',
-                    [
-                        'error' => $e->getMessage(),
-                    ]
-                );
-            }
+        ## parse h-cards
 
-            if (!$cards_response['cards'] && !$cards_response['representative']) {
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-h-card.twig',
-                    [
-                        'url' => $url,
-                        'showResult' => true,
-                        'core' => [],
-                        'additional' => [],
-                        'cards' => [],
-                        'representative' => [],
-                    ]
-                );
-            }
+        try {
+            $cards_response = $mfService->findHCards($url);
+        } catch (RuntimeException $e) {
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-card.twig',
+                [
+                    'error' => $e->getMessage(),
+                ]
+            );
+        }
 
-            ## parse properties
-
-            # use the first h-card by default
-            $card = $cards_response['cards'][0];
-
-            if ($cards_response['representative']) {
-                # use the representative h-card, if found
-                $card = $cards_response['representative'];
-            }
-
-            $properties = $mfService->parseHCardProperties($card);
-
+        if (!$cards_response['cards'] && !$cards_response['representative']) {
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-card.twig',
                 [
                     'url' => $url,
                     'showResult' => true,
-                    'core' => $properties['core'],
-                    'additional' => $properties['additional'],
-                    'cards' => $cards_response['cards'],
-                    'representative' => $cards_response['representative'],
+                    'core' => [],
+                    'additional' => [],
+                    'cards' => [],
+                    'representative' => [],
                 ]
             );
         }
 
+        ## parse properties
+
+        # use the first h-card by default
+        $card = $cards_response['cards'][0];
+
+        if ($cards_response['representative']) {
+            # use the representative h-card, if found
+            $card = $cards_response['representative'];
+        }
+
+        $properties = $mfService->parseHCardProperties($card);
+
         return $this->responder->withTemplate(
             $response,
-            'validate-h-card.twig'
+            'validate-h-card.twig',
+            [
+                'url' => $url,
+                'showResult' => true,
+                'core' => $properties['core'],
+                'additional' => $properties['additional'],
+                'cards' => $cards_response['cards'],
+                'representative' => $cards_response['representative'],
+            ]
         );
     }
 
@@ -259,58 +259,58 @@ final readonly class ValidateController
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
-        if ($input_url) {
-            # validate h-card for URL in query parameter
-            $url = $this->normalizeFullUrl($input_url);
-
-            if ($input_url !== $url) {
-                # ensure normalized URL in query parameter by redirecting
-                return $this->responder->withRedirectFor(
-                    $response,
-                    'validate_h_entry',
-                    [],
-                    ['url' => $url]
-                );
-            }
-
-            /**
-             * Note: below code was initially using the Microformats
-             * Service class, but I later started switching to a separate
-             * validator service for each type, e.g. ValidatorHEntry.
-             * -- Gregor Morrill 2024-12-08
-             *
-             * @todo finish migrating service
-             */
-
-            ## parse h-entries
-            $entries = $validator->findEntries($url);
-            if ($entries === []) {
-                $error = 'No h-entry was found on that page';
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-h-entry.twig',
-                    ['url' => $url, 'error' => $error]
-                );
-            }
-
-            $entry = $entries[0];
-            $postType = $validator->getPostType($entry);
-
-            $properties = $mfService->parseHEntryProperties($entry);
-
-            // @todo
-            $showResult = true;
-
+        if (!$input_url) {
             return $this->responder->withTemplate(
                 $response,
-                'validate-h-entry.twig',
-                ['showResult' => $showResult, 'properties' => $properties, 'postType' => $postType, 'url' => $url]
+                'validate-h-entry.twig'
             );
         }
 
+        # validate h-card for URL in query parameter
+        $url = $this->normalizeFullUrl($input_url);
+
+        if ($input_url !== $url) {
+            # ensure normalized URL in query parameter by redirecting
+            return $this->responder->withRedirectFor(
+                $response,
+                'validate_h_entry',
+                [],
+                ['url' => $url]
+            );
+        }
+
+        /**
+         * Note: below code was initially using the Microformats
+         * Service class, but I later started switching to a separate
+         * validator service for each type, e.g. ValidatorHEntry.
+         * -- Gregor Morrill 2024-12-08
+         *
+         * @todo finish migrating service
+         */
+
+        ## parse h-entries
+        $entries = $validator->findEntries($url);
+        if ($entries === []) {
+            $error = 'No h-entry was found on that page';
+            return $this->responder->withTemplate(
+                $response,
+                'validate-h-entry.twig',
+                ['url' => $url, 'error' => $error]
+            );
+        }
+
+        $entry = $entries[0];
+        $postType = $validator->getPostType($entry);
+
+        $properties = $mfService->parseHEntryProperties($entry);
+
+        // @todo
+        $showResult = true;
+
         return $this->responder->withTemplate(
             $response,
-            'validate-h-entry.twig'
+            'validate-h-entry.twig',
+            ['showResult' => $showResult, 'properties' => $properties, 'postType' => $postType, 'url' => $url]
         );
     }
 
