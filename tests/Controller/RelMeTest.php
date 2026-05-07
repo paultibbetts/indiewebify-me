@@ -60,8 +60,8 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
 
         $response = $this->get('/rel-me-check?' . http_build_query([
-            'url1' => IndieWeb\normaliseUrl($website),
-            'url2' => IndieWeb\normaliseUrl($profile),
+            'url1' => $website,
+            'url2' => $profile,
         ]));
         $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
@@ -107,8 +107,8 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(Microformats::class, $microformats);
 
         $response = $this->get('/rel-me-check?' . http_build_query([
-            'url1' => IndieWeb\normaliseUrl($website),
-            'url2' => IndieWeb\normaliseUrl($profile),
+            'url1' => $website,
+            'url2' => $profile,
         ]));
         $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
