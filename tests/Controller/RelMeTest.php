@@ -233,7 +233,47 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMeCheckReportsInsecureBacklink(): void
     {
-        // TODO: mock this scenario
-        $this->markTestIncomplete('Cover a matching backlink that redirects insecurely.');
+        $https = 'https://example.com/';
+        $http = 'http://example.com/';
+        $profile = 'https://profile.example/';
+        $insecureBacklink = '<a rel="me" href="' . $http . '">Website</a>';
+
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl', 'backlinkMatches'])
+            ->getMock();
+        $microformats = $this->createMock(Microformats::class);
+
+        $relMe->expects(self::once())
+            ->method('documentUrl')
+            ->with($profile)
+            ->willReturn([$profile, true, []]);
+        $microformats->expects(self::once())
+            ->method('httpGet')
+            ->with($profile)
+            ->willReturn([
+                'status' => 200,
+                'body' => $insecureBacklink,
+                'error' => null,
+                'redirects' => [],
+            ]);
+        $relMe->expects(self::once())
+            ->method('backlinkMatches')
+            ->with($http, $https)
+            ->willReturn([true, false, []]);
+
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Microformats::class, $microformats);
+
+        $response = $this->get('/rel-me-check?' . http_build_query([
+            'url1' => $https,
+            'url2' => $profile,
+        ]));
+        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $payload['status']);
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertTrue($payload['pass']);
+        self::assertFalse($payload['secure']);
     }
 }
