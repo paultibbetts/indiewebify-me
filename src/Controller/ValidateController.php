@@ -89,65 +89,65 @@ final readonly class ValidateController
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
-        if ($input_url) {
-            # validate rel-me for URL in query parameter
-            $url = $this->normalizeFullUrl($input_url);
-            if (!$url) {
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-rel-me.twig',
-                    ['error' => 'Could not parse the entered URL']
-                );
-            }
-
-            if ($input_url !== $url) {
-                # ensure normalized URL in query parameter by redirecting
-                return $this->responder->withRedirectFor(
-                    $response,
-                    'validate_rel_me',
-                    [],
-                    ['url' => $url]
-                );
-            }
-
-            # resolve any redirects and whether redirect chain is secure
-            [$url, $secure, $previous] = $relMe->documentUrl($url);
-
-            if (!$secure) {
-                $error = sprintf(
-                    'Insecure redirect between %s and %s',
-                    $url,
-                    array_pop($previous)
-                );
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-rel-me.twig',
-                    ['url' => $url, 'error' => $error]
-                );
-            }
-
-            $httpResponse = $mfService->httpGet($url);
-            if ($httpResponse['error']) {
-                $error = $httpResponse['error'];
-                return $this->responder->withTemplate(
-                    $response,
-                    'validate-rel-me.twig',
-                    ['url' => $url, 'error' => $error]
-                );
-            }
-
-            $rels = $relMe->links($httpResponse['body'], $url);
-
+        if (!$input_url) {
             return $this->responder->withTemplate(
                 $response,
-                'validate-rel-me.twig',
-                ['url' => $url, 'rels' => $rels]
+                'validate-rel-me.twig'
             );
         }
 
+        # validate rel-me for URL in query parameter
+        $url = $this->normalizeFullUrl($input_url);
+        if (!$url) {
+            return $this->responder->withTemplate(
+                $response,
+                'validate-rel-me.twig',
+                ['error' => 'Could not parse the entered URL']
+            );
+        }
+
+        if ($input_url !== $url) {
+            # ensure normalized URL in query parameter by redirecting
+            return $this->responder->withRedirectFor(
+                $response,
+                'validate_rel_me',
+                [],
+                ['url' => $url]
+            );
+        }
+
+        # resolve any redirects and whether redirect chain is secure
+        [$url, $secure, $previous] = $relMe->documentUrl($url);
+
+        if (!$secure) {
+            $error = sprintf(
+                'Insecure redirect between %s and %s',
+                $url,
+                array_pop($previous)
+            );
+            return $this->responder->withTemplate(
+                $response,
+                'validate-rel-me.twig',
+                ['url' => $url, 'error' => $error]
+            );
+        }
+
+        $httpResponse = $mfService->httpGet($url);
+        if ($httpResponse['error']) {
+            $error = $httpResponse['error'];
+            return $this->responder->withTemplate(
+                $response,
+                'validate-rel-me.twig',
+                ['url' => $url, 'error' => $error]
+            );
+        }
+
+        $rels = $relMe->links($httpResponse['body'], $url);
+
         return $this->responder->withTemplate(
             $response,
-            'validate-rel-me.twig'
+            'validate-rel-me.twig',
+            ['url' => $url, 'rels' => $rels]
         );
     }
 
