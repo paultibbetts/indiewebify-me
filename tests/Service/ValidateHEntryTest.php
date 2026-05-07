@@ -80,4 +80,45 @@ final class ValidateHEntryTest extends TestCase
         self::assertSame('post', $result['postType']);
     }
 
+    public function testCalculatesPostType(): void
+    {
+        $microformats = $this->getMockBuilder(Microformats::class)
+            ->onlyMethods(['findHEntries'])
+            ->getMock();
+        $validator = new ValidateHEntry($microformats);
+
+        $url = 'https://example.com/';
+        $post = "{$url}post";
+        $liked = 'https://indieweb.org/principles';
+        $content = '<a href="' . $liked . '" class="u-like-of">I like this page</a>';
+
+        $mf2 = [
+            [
+                'type' => ['h-entry'],
+                'properties' => [
+                    'name' => ['Example post'],
+                    'content' => [
+                        [
+                            'html' => "<p>{$content}</p>",
+                            'value' => $content,
+                        ],
+                    ],
+                    'like-of' => [$liked],
+                    'published' => ['2026-04-30T12:00:00+00:00'],
+                    'url' => [$post],
+                    'category' => ['indieweb'],
+                ],
+            ],
+        ];
+
+        $microformats->expects(self::once())
+            ->method('findHEntries')
+            ->with($url)
+            ->willReturn($mf2);
+
+        $result = $validator->validate($url);
+
+        self::assertSame('like', $result['postType']);
+    }
+
 }
