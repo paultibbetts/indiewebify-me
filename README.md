@@ -141,6 +141,26 @@ See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration..
 - [ ] merge into indieweb/indiewebify-me
 - [ ] host an IndieWeb Hackathon?
 
+## Migration Questions
+
+### http as default scheme?
+
+Should default scheme be `https` now?
+
+pros:
+- https is the new standard (?)
+
+cons:
+- http -> https redirect should be working on all sites
+
+### what is a minimal h-card?
+
+The example in the template looks old. is that mf1?
+
+The [wiki](https://indieweb.org/h-card#How_to_markup) does not include `u-url`?
+
+I am leaving the content as it is, but leaving this here to remind me.
+
 ## Credits
 
 Originally made by Brennan Novak, Barnaby Walters, and others at the 2013 IndieWebCamps in [Reykjavik](http://indieweb.org/2013/#Remote_Indiewebcamp_Parties) and [Brighton](http://indieweb.org/2013/UK).
