@@ -37,7 +37,7 @@
 		{% endfor %}
 	</ul>
 </div>
-{% elseif url != "" %}
+{% elseif url != "" and not error %}
 	<div class="alert alert-warning">
 		{# TODO: write content #}
 		No <code>rel="me"</code> links could be found on {{ url }}

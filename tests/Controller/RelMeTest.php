@@ -187,7 +187,7 @@ final class RelMeTest extends WebTestCase
         $payload = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString("No <code>rel=\"me\"</code> links could be found on {$url}.", $payload);
+        self::assertStringContainsString("No <code>rel=\"me\"</code> links could be found on {$url}", $payload);
     }
 
     public function testRelMeCheckFailsWhenBacklinkIsMissing(): void
