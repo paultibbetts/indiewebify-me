@@ -37,6 +37,11 @@
 		{% endfor %}
 	</ul>
 </div>
+{% elseif url != "" %}
+	<div class="alert alert-warning">
+		{# TODO: write content #}
+		No <code>rel="me"</code> links could be found on {{ url }}
+	</div>
 {% endif %}
 
 <form method="get" action="{{ url_for('validate_rel_me') }}#results" class="mb-3">
