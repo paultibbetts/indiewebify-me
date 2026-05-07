@@ -80,7 +80,9 @@ final class RelMeTest extends WebTestCase
         $profile = 'https://profile.example/';
         $validBacklink = '<a rel="me" href="' . $website . '">Website</a>';
 
-        $relMe = $this->createMock(RelMe::class);
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl', 'backlinkMatches'])
+            ->getMock();
         $microformats = $this->createMock(Microformats::class);
 
         $relMe->expects(self::once())
@@ -96,10 +98,6 @@ final class RelMeTest extends WebTestCase
                 'error' => null,
                 'redirects' => [],
             ]);
-        $relMe->expects(self::once())
-            ->method('links')
-            ->with($validBacklink, $profile)
-            ->willReturn([$website]);
         $relMe->expects(self::once())
             ->method('backlinkMatches')
             ->with($website, $website)
