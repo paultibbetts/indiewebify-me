@@ -42,9 +42,9 @@ final class SendWebmentionsTest extends WebTestCase
         $hEntryValidator = $this->createMock(ValidateHEntry::class);
 
         $hEntryValidator->expects(self::once())
-            ->method('findEntries')
+            ->method('validate')
             ->with($url)
-            ->willReturn([]);
+            ->willReturn(['entries' => []]);
 
         $this->container()->set(ValidateHEntry::class, $hEntryValidator);
 
@@ -66,13 +66,15 @@ final class SendWebmentionsTest extends WebTestCase
         $mentionSender = $this->createMock(MentionSender::class);
 
         $hEntryValidator->expects(self::once())
-            ->method('findEntries')
+            ->method('validate')
             ->with($url)
             ->willReturn([
-                [
-                    'type' => ['h-entry'],
-                    'properties' => [
-                        'name' => ['Example post with 2 mentions to send'],
+                'entries' => [
+                    [
+                        'type' => ['h-entry'],
+                        'properties' => [
+                            'name' => ['Example post with 2 mentions to send'],
+                        ],
                     ],
                 ],
             ]);

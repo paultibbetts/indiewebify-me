@@ -53,7 +53,8 @@ final readonly class WebmentionController
             );
         }
 
-        $entries = $hEntryValidator->findEntries($url);
+        $validation = $hEntryValidator->validate($url);
+        $entries = $validation['entries'];
         if ($entries === []) {
             return $this->responder->withTemplate(
                 $response,
