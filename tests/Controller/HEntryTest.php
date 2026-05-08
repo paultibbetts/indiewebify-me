@@ -68,7 +68,7 @@ final class HEntryTest extends WebTestCase
                     ],
                 ],
             ],
-            'postType' => 'post',
+            'postType' => 'article',
             'properties' => [
                 'name' => 'Example post',
                 'name_state' => 'valid',
@@ -107,6 +107,7 @@ final class HEntryTest extends WebTestCase
         self::assertStringContainsString($content, $payload);
         self::assertStringContainsString($author, $payload);
         self::assertStringContainsString($photo, $payload);
+        self::assertStringContainsString('article', $payload);
         self::assertStringNotContainsString('these are not rendered', $payload);
     }
 

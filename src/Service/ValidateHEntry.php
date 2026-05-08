@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use BarnabyWalters\Mf2 as Mf2Helper;
 use App\Service\Microformats;
 
 class ValidateHEntry
@@ -26,8 +25,10 @@ class ValidateHEntry
         'categories',
     ];
 
-    public function __construct(private Microformats $microformats)
-    {
+    public function __construct(
+        private readonly Microformats $microformats,
+        private readonly PostTypeDiscovery $ptd,
+    ) {
     }
 
     /**
@@ -49,25 +50,9 @@ class ValidateHEntry
 
         return [
             'entries' => $entries,
-            'postType' => $this->getPostType($entry),
+            'postType' => $this->ptd->discover($entry)->value,
             'properties' => $this->microformats->parseHEntryProperties($entry),
         ];
     }
 
-    /**
-     * @see https://indieweb.org/ptd
-     */
-    public function getPostType(array $entry): string
-    {
-        $type = 'post';
-        if (Mf2Helper\hasProp($entry, 'in-reply-to')) {
-            $type = 'reply';
-        } elseif (Mf2Helper\hasProp($entry, 'like-of')) {
-            $type = 'like';
-        } elseif (Mf2Helper\hasProp($entry, 'repost-of')) {
-            $type = 'repost';
-        }
-
-        return $type;
-    }
 }

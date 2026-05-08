@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
+use App\Domain\PostType;
 use App\Service\Microformats;
+use App\Service\PostTypeDiscovery;
 use App\Service\ValidateHEntry;
-use DI\Container;
 use PHPUnit\Framework\TestCase;
 use Slim\App;
 
@@ -29,7 +30,8 @@ final class ValidateHEntryTest extends TestCase
         $microformats = $this->getMockBuilder(Microformats::class)
             ->onlyMethods(['findHEntries'])
             ->getMock();
-        $validator = new ValidateHEntry($microformats);
+        $ptd = new PostTypeDiscovery();
+        $validator = new ValidateHEntry($microformats, $ptd);
 
         $url = 'https://example.com/';
         $post = "{$url}post";
@@ -77,48 +79,7 @@ final class ValidateHEntryTest extends TestCase
         self::assertSame($author, $result['properties']['author']['name']);
         self::assertSame($photo, $result['properties']['author']['photo']);
         self::assertSame($content, $result['properties']['content']);
-        self::assertSame('post', $result['postType']);
-    }
-
-    public function testCalculatesPostType(): void
-    {
-        $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHEntries'])
-            ->getMock();
-        $validator = new ValidateHEntry($microformats);
-
-        $url = 'https://example.com/';
-        $post = "{$url}post";
-        $liked = 'https://indieweb.org/principles';
-        $content = '<a href="' . $liked . '" class="u-like-of">I like this page</a>';
-
-        $mf2 = [
-            [
-                'type' => ['h-entry'],
-                'properties' => [
-                    'name' => ['Example post'],
-                    'content' => [
-                        [
-                            'html' => "<p>{$content}</p>",
-                            'value' => $content,
-                        ],
-                    ],
-                    'like-of' => [$liked],
-                    'published' => ['2026-04-30T12:00:00+00:00'],
-                    'url' => [$post],
-                    'category' => ['indieweb'],
-                ],
-            ],
-        ];
-
-        $microformats->expects(self::once())
-            ->method('findHEntries')
-            ->with($url)
-            ->willReturn($mf2);
-
-        $result = $validator->validate($url);
-
-        self::assertSame('like', $result['postType']);
+        self::assertSame('article', $result['postType']);
     }
 
 }
