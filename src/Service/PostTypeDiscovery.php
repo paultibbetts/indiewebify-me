@@ -77,7 +77,8 @@ class PostTypeDiscovery
         }
 
         // TODO: confirm
-        if ($this->hasValidUrl($entry, 'jam-of')) {
+        // there is no standard for this
+        if ($this->hasValidUrl($entry, 'jam-of')) { // ?
             return PostType::Jam;
         }
 
