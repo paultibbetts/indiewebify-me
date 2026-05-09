@@ -20,7 +20,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
         self::assertSame('warning', $check['status']);
         self::assertSame('author.missing', $check['state']);
-        self::assertSame('author_missing', $check['help']);
+        self::assertSame('Add an author!', $check['help']['html']);
     }
 
     public function testStringAuthor(): void
@@ -34,7 +34,8 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('author.string', $check['state']);
         self::assertSame('text', $check['value']['type']);
-        self::assertSame('author_string_needs_hcard', $check['help']);
+        self::assertStringContainsString('add <code>h-card</code>', $check['help']['html']);
+        self::assertSame('<a class="p-author h-card" href="…">Example Person</a>', $check['help']['example']);
     }
 
     public function testCompleteHCardAuthor(): void
@@ -62,7 +63,7 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('author.h-card.partial', $check['state']);
         self::assertSame('author.photo.missing', $photo['state']);
-        self::assertSame('author_photo_missing', $photo['help']);
+        self::assertSame('Add a photo!', $photo['help']['html']);
     }
 
     public function testMissingNameIsNeutral(): void
@@ -119,7 +120,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
         self::assertSame('warning', $check['status']);
         self::assertSame('interaction.intent-detected-but-no-parsed-value', $check['state']);
-        self::assertSame('interaction_intent_detected_no_value', $check['help']);
+        self::assertStringContainsString('no value was parsed', $check['help']['html']);
     }
 
     public function testValidRsvpValue(): void
@@ -146,7 +147,7 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('rsvp.invalid', $check['state']);
         self::assertSame('definitely', $check['value']['text']);
-        self::assertSame('rsvp_invalid', $check['help']);
+        self::assertStringContainsString('RSVP should be one of', $check['help']['html']);
     }
 
     public function testRsvpIntentDetectedButNoParsedValue(): void
@@ -161,7 +162,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
         self::assertSame('warning', $check['status']);
         self::assertSame('rsvp.missing', $check['state']);
-        self::assertSame('rsvp_missing', $check['help']);
+        self::assertStringContainsString('no RSVP value was parsed', $check['help']['html']);
     }
 
     /**

@@ -111,7 +111,16 @@ class ValidateHEntry
         $content = $this->firstPlaintext($entry, 'content');
 
         if ($content !== null && mb_strlen($name) > mb_strlen($content)) {
-            return $this->checkResult('name', 'Name', self::WARNING, 'name.probably-implicit', $this->textValue($name), 'name_probably_implicit');
+            return $this->checkResult(
+                'name',
+                'Name',
+                self::WARNING,
+                'name.probably-implicit',
+                $this->textValue($name),
+                [
+                    'html' => 'The parsed <code>name</code> is longer than the content, which is usually a sign it is malformed due to being implicitly rather than explicitly parsed.',
+                ],
+            );
         }
 
         return $this->checkResult('name', 'Name', self::PASS, 'name.present', $this->textValue($name));
@@ -126,7 +135,16 @@ class ValidateHEntry
         $author = $this->firstProperty($entry, 'author');
 
         if ($author === null) {
-            return $this->checkResult('author', 'Author', self::WARNING, 'author.missing', help: 'author_missing');
+            return $this->checkResult(
+                'author',
+                'Author',
+                self::WARNING,
+                'author.missing',
+                help: [
+                    'html' => 'Add an author!',
+                    'example' => '<a rel="author" class="p-author h-card" href="…">Your Name</a>',
+                ],
+            );
         }
 
         if (is_scalar($author) && trim((string) $author) !== '') {
@@ -138,7 +156,10 @@ class ValidateHEntry
                 self::WARNING,
                 'author.string',
                 $this->textValue($authorName),
-                'author_string_needs_hcard',
+                [
+                    'html' => 'You’re marking up your post’s author as a string — add <code>h-card</code> to make it a full h-card!',
+                    'example' => sprintf('<a class="p-author h-card" href="…">%s</a>', $authorName),
+                ],
                 [
                     $this->checkResult('author.name', 'Author Name', self::PASS, 'author.name.present', $this->textValue($authorName)),
                     $this->checkResult('author.url', 'Author URL', self::INFO, 'author.url.unavailable-from-string'),
@@ -148,7 +169,15 @@ class ValidateHEntry
         }
 
         if (!$this->isMicroformat($author)) {
-            return $this->checkResult('author', 'Author', self::WARNING, 'author.unrecognized', help: 'author_unrecognized');
+            return $this->checkResult(
+                'author',
+                'Author',
+                self::WARNING,
+                'author.unrecognized',
+                help: [
+                    'html' => 'The author value was present, but it was not a readable string or nested microformat.',
+                ],
+            );
         }
 
         /** @var array<string, mixed> $author */
@@ -169,7 +198,10 @@ class ValidateHEntry
                 self::WARNING,
                 'author.microformat.not-h-card',
                 $value,
-                'author_microformat_should_be_hcard',
+                [
+                    'html' => 'The author is a nested microformat, but authors should be marked up as an <code>h-card</code>.',
+                    'example' => '<a class="p-author h-card" href="/">Your Name</a>',
+                ],
             );
         }
 
@@ -183,13 +215,40 @@ class ValidateHEntry
             $value,
             children: [
                 $name === null
-                    ? $this->checkResult('author.name', 'Author Name', self::WARNING, 'author.name.missing', help: 'author_name_missing')
+                    ? $this->checkResult(
+                        'author.name',
+                        'Author Name',
+                        self::WARNING,
+                        'author.name.missing',
+                        help: [
+                            'html' => 'Add a name inside the author <code>h-card</code>.',
+                            'example' => '<span class="p-name">Your Name</span>',
+                        ],
+                    )
                     : $this->checkResult('author.name', 'Author Name', self::PASS, 'author.name.present', $this->textValue($name)),
                 $authorUrl === null
-                    ? $this->checkResult('author.url', 'Author URL', self::WARNING, 'author.url.missing', help: 'author_url_missing')
+                    ? $this->checkResult(
+                        'author.url',
+                        'Author URL',
+                        self::WARNING,
+                        'author.url.missing',
+                        help: [
+                            'html' => 'Add a URL inside the author <code>h-card</code>. You can combine it with the author name.',
+                            'example' => '<a class="p-name u-url" href="/">Your Name</a>',
+                        ],
+                    )
                     : $this->checkResult('author.url', 'Author URL', self::PASS, 'author.url.present', $this->urlValue($authorUrl)),
                 $photo === null
-                    ? $this->checkResult('author.photo', 'Author Photo', self::WARNING, 'author.photo.missing', help: 'author_photo_missing')
+                    ? $this->checkResult(
+                        'author.photo',
+                        'Author Photo',
+                        self::WARNING,
+                        'author.photo.missing',
+                        help: [
+                            'html' => 'Add a photo!',
+                            'example' => '<img class="u-photo" src="…" />',
+                        ],
+                    )
                     : $this->checkResult('author.photo', 'Author Photo', self::PASS, 'author.photo.present', ['type' => 'image', 'url' => $photo]),
             ],
         );
@@ -200,14 +259,33 @@ class ValidateHEntry
         $rsvp = $this->firstPlaintext($entry, 'rsvp');
 
         if ($rsvp === null) {
-            return $this->checkResult('rsvp', 'RSVP', self::WARNING, 'rsvp.missing', help: 'rsvp_missing');
+            return $this->checkResult(
+                'rsvp',
+                'RSVP',
+                self::WARNING,
+                'rsvp.missing',
+                help: [
+                    'html' => 'The post looks like an RSVP, but no RSVP value was parsed.',
+                    'example' => '<data class="p-rsvp" value="yes">I’m going</data>',
+                ],
+            );
         }
 
         $normalized = strtolower($rsvp);
         $valid = in_array($normalized, self::VALID_RSVP_VALUES, true);
 
         if (!$valid) {
-            return $this->checkResult('rsvp', 'RSVP', self::WARNING, 'rsvp.invalid', $this->textValue($rsvp), 'rsvp_invalid');
+            return $this->checkResult(
+                'rsvp',
+                'RSVP',
+                self::WARNING,
+                'rsvp.invalid',
+                $this->textValue($rsvp),
+                [
+                    'html' => 'RSVP should be one of <code>yes</code>, <code>no</code>, <code>maybe</code>, or <code>interested</code>.',
+                    'example' => '<data class="p-rsvp" value="yes">I’m going</data>',
+                ],
+            );
         }
 
         return $this->checkResult('rsvp', 'RSVP', self::PASS, 'rsvp.valid', $this->textValue($normalized));
@@ -222,7 +300,16 @@ class ValidateHEntry
         $content = $this->firstProperty($entry, 'content');
 
         if ($content === null) {
-            return $this->checkResult('content', 'Content', self::WARNING, 'content.missing', help: 'content_missing');
+            return $this->checkResult(
+                'content',
+                'Content',
+                self::WARNING,
+                'content.missing',
+                help: [
+                    'html' => 'Add some content!',
+                    'example' => '<p class="e-content">…</p>',
+                ],
+            );
         }
 
         if (is_array($content)) {
@@ -247,11 +334,22 @@ class ValidateHEntry
                 self::WARNING,
                 'content.plain',
                 $this->textValue(trim((string) $content)),
-                'content_prefer_e_content',
+                [
+                    'html' => 'It looks like your content is marked up as a plain property — consider using <code>class="e-content"</code> so that consumers can parse rich text (i.e. with images and formatting)',
+                ],
             );
         }
 
-        return $this->checkResult('content', 'Content', self::WARNING, 'content.missing', help: 'content_missing');
+        return $this->checkResult(
+            'content',
+            'Content',
+            self::WARNING,
+            'content.missing',
+            help: [
+                'html' => 'Add some content!',
+                'example' => '<p class="e-content">…</p>',
+            ],
+        );
     }
 
     /**
@@ -263,7 +361,16 @@ class ValidateHEntry
         $published = $this->firstPlaintext($entry, 'published');
 
         if ($published === null) {
-            return $this->checkResult('published', 'Published', self::WARNING, 'published.missing', help: 'published_missing');
+            return $this->checkResult(
+                'published',
+                'Published',
+                self::WARNING,
+                'published.missing',
+                help: [
+                    'html' => 'Add a publication datetime!',
+                    'example' => '<time class="dt-published" datetime="YYYY-MM-DDTHH:MM:SS+00:00">The Date</time>',
+                ],
+            );
         }
 
         if (!$this->isDateTimeValid($published)) {
@@ -273,7 +380,9 @@ class ValidateHEntry
                 self::WARNING,
                 'published.malformed',
                 $this->textValue($published),
-                'published_malformed',
+                [
+                    'html' => 'The datetime is not valid ISO-8601.',
+                ],
             );
         }
 
@@ -289,11 +398,29 @@ class ValidateHEntry
         $url = $this->firstPlaintext($entry, 'url');
 
         if ($url === null) {
-            return $this->checkResult('url', 'URL', self::WARNING, 'url.missing', help: 'url_missing');
+            return $this->checkResult(
+                'url',
+                'URL',
+                self::WARNING,
+                'url.missing',
+                help: [
+                    'html' => 'Add a URL!',
+                    'example' => '<a class="u-url" href="…">…</a>',
+                ],
+            );
         }
 
         if (!$this->looksLikeUrl($url)) {
-            return $this->checkResult('url', 'URL', self::WARNING, 'url.malformed', $this->textValue($url), 'url_malformed');
+            return $this->checkResult(
+                'url',
+                'URL',
+                self::WARNING,
+                'url.malformed',
+                $this->textValue($url),
+                [
+                    'html' => 'The parsed post URL does not look like an absolute URL.',
+                ],
+            );
         }
 
         return $this->checkResult('url', 'URL', self::PASS, 'url.valid', $this->urlValue($url));
@@ -308,7 +435,16 @@ class ValidateHEntry
         $categories = $this->allPlaintext($entry, 'category');
 
         if ($categories === []) {
-            return $this->checkResult('category', 'Categories', self::INFO, 'category.missing', help: 'category_missing');
+            return $this->checkResult(
+                'category',
+                'Categories',
+                self::INFO,
+                'category.missing',
+                help: [
+                    'html' => 'Add some categories!',
+                    'example' => '<a class="p-category" href="…">…</a>',
+                ],
+            );
         }
 
         return $this->checkResult('category', 'Categories', self::PASS, 'category.present', [
@@ -337,11 +473,22 @@ class ValidateHEntry
                     $label,
                     self::WARNING,
                     'interaction.intent-detected-but-no-parsed-value',
-                    help: 'interaction_intent_detected_no_value',
+                    help: [
+                        'html' => 'The HTML suggests this interaction target, but no value was parsed. Check that the class is on a URL-bearing element.',
+                    ],
                 );
             }
 
-            return $this->checkResult($propertyName, $label, self::WARNING, 'interaction.target.missing', help: 'interaction_target_missing_url');
+            return $this->checkResult(
+                $propertyName,
+                $label,
+                self::WARNING,
+                'interaction.target.missing',
+                help: [
+                    'html' => 'Give the nested microformat a URL property!',
+                    'example' => '<a class="u-url" href="…"></a>',
+                ],
+            );
         }
 
         $children = [];
@@ -391,18 +538,45 @@ class ValidateHEntry
             $url = trim((string) $value);
 
             if ($url === '') {
-                return $this->checkResult($id, $childLabel, self::WARNING, 'interaction.target.missing-url', help: 'interaction_target_missing_url');
+                return $this->checkResult(
+                    $id,
+                    $childLabel,
+                    self::WARNING,
+                    'interaction.target.missing-url',
+                    help: [
+                        'html' => 'Give the nested microformat a URL property!',
+                        'example' => '<a class="u-url" href="…"></a>',
+                    ],
+                );
             }
 
             if (!$this->looksLikeUrl($url)) {
-                return $this->checkResult($id, $childLabel, self::WARNING, 'interaction.target.malformed-url', $this->textValue($url), 'interaction_target_malformed_url');
+                return $this->checkResult(
+                    $id,
+                    $childLabel,
+                    self::WARNING,
+                    'interaction.target.malformed-url',
+                    $this->textValue($url),
+                    [
+                        'html' => 'The value for this property should be a URL or an embedded <a href="http://microformats.org/wiki/h-cite"><code>h-cite</code></a>.',
+                    ],
+                );
             }
 
             return $this->checkResult($id, $childLabel, self::PASS, 'interaction.url.valid', $this->urlValue($url));
         }
 
         if (!$this->isMicroformat($value)) {
-            return $this->checkResult($id, $childLabel, self::WARNING, 'interaction.target.unrecognized', help: 'interaction_target_missing_url');
+            return $this->checkResult(
+                $id,
+                $childLabel,
+                self::WARNING,
+                'interaction.target.unrecognized',
+                help: [
+                    'html' => 'Give the nested microformat a URL property!',
+                    'example' => '<a class="u-url" href="…"></a>',
+                ],
+            );
         }
 
         /** @var array<string, mixed> $value */
@@ -410,13 +584,39 @@ class ValidateHEntry
         $children = [];
 
         if (!$this->hasType($value, 'h-cite')) {
-            $children[] = $this->checkResult($id . '.h-cite', 'h-cite', self::WARNING, 'interaction.target.not-h-cite', help: 'interaction_target_should_be_h_cite');
+            $children[] = $this->checkResult(
+                $id . '.h-cite',
+                'h-cite',
+                self::WARNING,
+                'interaction.target.not-h-cite',
+                help: [
+                    'html' => 'The nested microformat should be an <a href="http://microformats.org/wiki/h-cite"><code>h-cite</code></a> as it refers to off-site content.',
+                ],
+            );
         }
 
         if ($url === null) {
-            $children[] = $this->checkResult($id . '.url', 'Target URL', self::WARNING, 'interaction.target.missing-url', help: 'interaction_target_missing_url');
+            $children[] = $this->checkResult(
+                $id . '.url',
+                'Target URL',
+                self::WARNING,
+                'interaction.target.missing-url',
+                help: [
+                    'html' => 'Give the nested microformat a URL property!',
+                    'example' => '<a class="u-url" href="…"></a>',
+                ],
+            );
         } elseif (!$this->looksLikeUrl($url)) {
-            $children[] = $this->checkResult($id . '.url', 'Target URL', self::WARNING, 'interaction.target.malformed-url', $this->textValue($url), 'interaction_target_malformed_url');
+            $children[] = $this->checkResult(
+                $id . '.url',
+                'Target URL',
+                self::WARNING,
+                'interaction.target.malformed-url',
+                $this->textValue($url),
+                [
+                    'html' => 'The value for this property should be a URL or an embedded <a href="http://microformats.org/wiki/h-cite"><code>h-cite</code></a>.',
+                ],
+            );
         }
 
         return $this->checkResult(
@@ -563,7 +763,7 @@ class ValidateHEntry
         string $status,
         string $state,
         ?array $value = null,
-        ?string $help = null,
+        ?array $help = null,
         array $children = [],
     ): array {
         return [

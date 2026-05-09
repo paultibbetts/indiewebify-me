@@ -70,7 +70,13 @@
     {% endif %}
 
     {% if check.help %}
-        {% include 'pages/partials/h-entry-help.twig' with { help: check.help, check: check } only %}
+        {% if check.help.html %}
+            <p class="mb-2">{{ check.help.html|raw }}</p>
+        {% endif %}
+
+        {% if check.help.example %}
+            <code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code></pre>
+        {% endif %}
     {% endif %}
 
     {% if check.status != 'pass' and check.children %}

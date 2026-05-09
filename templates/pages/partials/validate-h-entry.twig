@@ -23,9 +23,9 @@
     <div class="result alert alert-success my-4">
         <p>We found the following <b>{{ report.postType }}</b> <code>h-entry</code> on your site:</p>
 
-        {% for check in report.checks %}
-            {% include 'pages/partials/h-entry-check.twig' with { check: check } only %}
-        {% endfor %}
+		{% for check in report.checks %}
+			{% include 'pages/partials/h-entry-check.twig' with { check: check } only %}
+		{% endfor %}
     </div>
 {% endif %}
 
