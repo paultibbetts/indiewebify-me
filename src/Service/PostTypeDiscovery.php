@@ -29,55 +29,31 @@ class PostTypeDiscovery
             return PostType::RSVP;
         }
 
-        // TODO: confirm
-        if ($this->hasProperty($entry, 'invitee')) {
-            return PostType::Invitation;
-        }
+        $propertyPostTypes = [
+            // TODO: confirm
+            'invitee' => PostType::Invitation,
+            'in-reply-to' => PostType::Reply,
+            'repost-of' => PostType::Repost,
+            'like-of' => PostType::Like,
+            // TODO: confirm
+            'bookmark-of' => PostType::Bookmark,
+            // TODO: confirm
+            'quotation-of' => PostType::Quotation,
+            'video' => PostType::Video,
+            'photo' => PostType::Photo,
+            // TODO: confirm
+            'audio' => PostType::Audio,
+            // TODO: confirm
+            // there is no standard for this
+            'jam-of' => PostType::Jam, // ?
+            // TODO: confirm
+            'checkin' => PostType::CheckIn,
+        ];
 
-        if ($this->hasProperty($entry, 'in-reply-to')) {
-            return PostType::Reply;
-        }
-
-        if ($this->hasProperty($entry, 'repost-of')) {
-            return PostType::Repost;
-        }
-
-        if ($this->hasProperty($entry, 'like-of')) {
-            return PostType::Like;
-        }
-
-        // TODO: confirm
-        if ($this->hasProperty($entry, 'bookmark-of')) {
-            return PostType::Bookmark;
-        }
-
-        // TODO: confirm
-        if ($this->hasProperty($entry, 'quotation-of')) {
-            return PostType::Quotation;
-        }
-
-        if ($this->hasProperty($entry, 'video')) {
-            return PostType::Video;
-        }
-
-        if ($this->hasProperty($entry, 'photo')) {
-            return PostType::Photo;
-        }
-
-        // TODO: confirm
-        if ($this->hasProperty($entry, 'audio')) {
-            return PostType::Audio;
-        }
-
-        // TODO: confirm
-        // there is no standard for this
-        if ($this->hasProperty($entry, 'jam-of')) { // ?
-            return PostType::Jam;
-        }
-
-        // TODO: confirm
-        if ($this->hasProperty($entry, 'checkin')) {
-            return PostType::CheckIn;
+        foreach ($propertyPostTypes as $property => $postType) {
+            if ($this->hasProperty($entry, $property)) {
+                return $postType;
+            }
         }
 
         $content = $this->firstNonEmptyValue($entry, 'content')
