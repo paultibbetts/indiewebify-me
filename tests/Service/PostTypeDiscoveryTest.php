@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 final class PostTypeDiscoveryTest extends TestCase
 {
     #[DataProvider('postTypeHtmlExamples')]
-    public function testDiscoversPostTypesFromHtml(string $html, PostType $expected, bool $match = true): void
+    public function testDiscoversPostTypesFromHtml(string $html, PostType $expected): void
     {
         $hentry = '<article class="h-entry">' . $html . '</article>';
         $microformats = Mf2\parse($hentry, 'https://example.com/');
@@ -26,11 +26,7 @@ final class PostTypeDiscoveryTest extends TestCase
 
         $postType = $discovery->discover($entries[0]);
 
-        if ($match) {
-            self::assertSame($expected, $postType);
-        } else {
-            self::assertNotSame($expected, $postType);
-        }
+        self::assertSame($expected, $postType);
     }
 
     public static function postTypeHtmlExamples(): array
@@ -52,23 +48,9 @@ final class PostTypeDiscoveryTest extends TestCase
                 '<img class="u-photo" href="https://example.com/img.jpeg">',
                 PostType::Photo,
             ],
-            /*
-            // this does not work
-            // because the parser gives it a default "src" of the page it's parsing
-            'photo-no-url' => [
-                '<img class="u-photo">',
-                PostType::Photo,
-                false,
-            ],
-            */
             'reply' => [
                 '<a class="u-in-reply-to" href="https://example.com/post">Good idea!</a>',
                 PostType::Reply,
-            ],
-            'reply-no-url' => [
-                '<a class="u-in-reply-to">I forgot to include the link</a>',
-                PostType::Reply,
-                false,
             ],
             'repost' => [
                 '<a class="u-repost-of" href="https://example.com/post">a post</a>',

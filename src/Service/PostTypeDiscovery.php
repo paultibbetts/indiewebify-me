@@ -15,13 +15,6 @@ class PostTypeDiscovery
 
     public function discover(array $entry): PostType
     {
-        // TODO: confirm how strict this should be
-        // because this app is meant to assist with invalid entries
-        // example:
-        // a. 'u-like-of' prop = 'like'
-        // vs
-        // b. 'u-like-of' prop + valid url = 'like' (current)
-
         // TODO: confirm
         if ($this->firstNonEmptyValue($entry, 'deleted') !== null) {
             return PostType::Delete;
@@ -41,44 +34,44 @@ class PostTypeDiscovery
             return PostType::Invitation;
         }
 
-        if ($this->hasValidUrl($entry, 'in-reply-to')) {
+        if ($this->hasProperty($entry, 'in-reply-to')) {
             return PostType::Reply;
         }
 
-        if ($this->hasValidUrl($entry, 'repost-of')) {
+        if ($this->hasProperty($entry, 'repost-of')) {
             return PostType::Repost;
         }
 
-        if ($this->hasValidUrl($entry, 'like-of')) {
+        if ($this->hasProperty($entry, 'like-of')) {
             return PostType::Like;
         }
 
         // TODO: confirm
-        if ($this->hasValidUrl($entry, 'bookmark-of')) {
+        if ($this->hasProperty($entry, 'bookmark-of')) {
             return PostType::Bookmark;
         }
 
         // TODO: confirm
-        if ($this->hasValidUrl($entry, 'quotation-of')) {
+        if ($this->hasProperty($entry, 'quotation-of')) {
             return PostType::Quotation;
         }
 
-        if ($this->hasValidUrl($entry, 'video')) {
+        if ($this->hasProperty($entry, 'video')) {
             return PostType::Video;
         }
 
-        if ($this->hasValidUrl($entry, 'photo')) {
+        if ($this->hasProperty($entry, 'photo')) {
             return PostType::Photo;
         }
 
         // TODO: confirm
-        if ($this->hasValidUrl($entry, 'audio')) {
+        if ($this->hasProperty($entry, 'audio')) {
             return PostType::Audio;
         }
 
         // TODO: confirm
         // there is no standard for this
-        if ($this->hasValidUrl($entry, 'jam-of')) { // ?
+        if ($this->hasProperty($entry, 'jam-of')) { // ?
             return PostType::Jam;
         }
 
@@ -135,25 +128,6 @@ class PostTypeDiscovery
         );
     }
 
-    private function hasValidUrl(array $entry, string $property): bool
-    {
-        if (!$this->hasProperty($entry, $property)) {
-            return false;
-        }
-
-        foreach ($entry['properties'][$property] as $value) {
-            foreach ($this->urlValues($value) as $url) {
-                // TODO: confirm strictness of valid URL
-                // considering this app is meant to assist when things are invalid
-                if (filter_var($url, FILTER_VALIDATE_URL) !== false) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     /**
      * @return list<string>
      */
@@ -186,28 +160,6 @@ class PostTypeDiscovery
     private function firstNonEmptyValue(array $entry, string $property): ?string
     {
         return $this->propertyValues($entry, $property)[0] ?? null;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function urlValues(mixed $value): array
-    {
-        if (Mf2\isMicroformat($value) && $this->hasProperty($value, 'url')) {
-            return $this->normalizePlaintextValues(
-                Mf2\getPlaintextArray($value, 'url', [])
-            );
-        }
-
-        if (Mf2\isMicroformat($value)) {
-            return $this->normalizePlaintextValues(
-                isset($value['value'])
-                    ? [$value['value']]
-                    : []
-            );
-        }
-
-        return $this->normalizePlaintextValues([Mf2\toPlaintext($value)]);
     }
 
     private function normalizePostTypeText(string $value): string
