@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Domain\PostType;
 use App\Service\Microformats;
 use App\Service\PostTypeDiscovery;
 use App\Service\ValidateHEntry;
@@ -28,7 +27,7 @@ final class ValidateHEntryTest extends TestCase
     public function testValidates(): void
     {
         $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHEntries'])
+            ->onlyMethods(['findHEntriesWithHtml'])
             ->getMock();
         $ptd = new PostTypeDiscovery();
         $validator = new ValidateHEntry($microformats, $ptd);
@@ -68,18 +67,20 @@ final class ValidateHEntryTest extends TestCase
         ];
 
         $microformats->expects(self::once())
-            ->method('findHEntries')
+            ->method('findHEntriesWithHtml')
             ->with($url)
-            ->willReturn($mf2);
+            ->willReturn([
+                'entries' => $mf2,
+                'html' => '<article class="h-entry">not used in this test</article>',
+            ]);
 
-        $result = $validator->validate($url);
+        $report = $validator->validate($url);
 
-        self::assertCount(1, $result['entries']);
-        self::assertSame($post, $result['properties']['url']);
-        self::assertSame($author, $result['properties']['author']['name']);
-        self::assertSame($photo, $result['properties']['author']['photo']);
-        self::assertSame($content, $result['properties']['content']);
-        self::assertSame('article', $result['postType']);
+        self::assertTrue($report['found']);
+        self::assertSame($url, $report['url']);
+        self::assertSame('article', $report['postType']);
+        self::assertSame('name', $report['checks'][0]['id']);
+        self::assertSame('author', $report['checks'][1]['id']);
+        self::assertSame('content', $report['checks'][2]['id']);
     }
-
 }

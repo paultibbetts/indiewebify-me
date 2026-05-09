@@ -8,7 +8,7 @@ use IndieWeb\MentionClient;
 
 class MentionSender
 {
-    public function __construct(private MentionClient $client)
+    public function __construct(private readonly MentionClient $client)
     {
     }
 

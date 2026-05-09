@@ -123,7 +123,7 @@ class Microformats
             } else {
                 $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
             }
-        } catch (TransferException $e) {
+        } catch (TransferException) {
             $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
         }
 
@@ -160,6 +160,14 @@ class Microformats
 
     public function fetch(string $url): array
     {
+        return $this->fetchWithHtml($url)['microformats'];
+    }
+
+    /**
+     * @return array{microformats: array<string, mixed>, html: string}
+     */
+    public function fetchWithHtml(string $url): array
+    {
         $response = $this->httpGet($url);
 
         if ($response['error']) {
@@ -167,7 +175,12 @@ class Microformats
         }
 
         try {
-            return Mf2\parse($response['body'], $url, convertClassic: true);
+            $html = (string) $response['body'];
+
+            return [
+                'microformats' => Mf2\parse($html, $url, convertClassic: true),
+                'html' => $html,
+            ];
         } catch (Throwable $e) {
             throw new RuntimeException('Could not parse page.', $e->getCode(), previous: $e);
         }
@@ -194,8 +207,20 @@ class Microformats
      */
     public function findHEntries(string $url): array
     {
-        $microformats = $this->fetch($url);
-        return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
+        return $this->findHEntriesWithHtml($url)['entries'];
+    }
+
+    /**
+     * @return array{entries: list<array<string, mixed>>, html: string}
+     */
+    public function findHEntriesWithHtml(string $url): array
+    {
+        $result = $this->fetchWithHtml($url);
+
+        return [
+            'entries' => Mf2Helper\findMicroformatsByType($result['microformats'], 'h-entry'),
+            'html' => $result['html'],
+        ];
     }
 
     public function parseHCardProperties(array $h_card): array
@@ -315,24 +340,5 @@ class Microformats
         }
 
         return $response;
-    }
-
-    /**
-     * Provided a parsed h-entry microformat, determine the post type
-     *
-     * @see https://indieweb.org/ptd
-     */
-    public function discoverPostType(array $h_entry): string
-    {
-        $type = 'post';
-        if (Mf2Helper\hasProp($h_entry, 'in-reply-to')) {
-            $type = 'reply';
-        } elseif (Mf2Helper\hasProp($h_entry, 'like-of')) {
-            $type = 'like';
-        } elseif (Mf2Helper\hasProp($h_entry, 'repost-of')) {
-            $type = 'repost';
-        }
-
-        return $type;
     }
 }

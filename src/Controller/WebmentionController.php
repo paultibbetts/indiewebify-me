@@ -54,8 +54,7 @@ final readonly class WebmentionController
         }
 
         $validation = $hEntryValidator->validate($url);
-        $entries = $validation['entries'];
-        if ($entries === []) {
+        if (!$validation['found']) {
             return $this->responder->withTemplate(
                 $response,
                 'send-webmentions.twig',
@@ -68,17 +67,12 @@ final readonly class WebmentionController
 
         $numSent = $mentionSender->send($url);
 
-        $result = [
-            'hEntriesFound' => count($entries),
-            'numSent' => $numSent,
-        ];
-
         return $this->responder->withTemplate(
             $response,
             'send-webmentions.twig',
             [
                 'url' => $url,
-                'result' => $result,
+                'numSent' => $numSent,
             ]
         );
     }

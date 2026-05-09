@@ -39,8 +39,8 @@
 	</div>
 </form>
 
-{% if result %}
+{% if numSent %}
 <div class="result alert alert-success my-4">
-	<p>Successfully sent {{ result.numSent }} webmentions from <code>{{ url }}</code></p>
+	<p>Successfully sent {{ numSent }} webmentions from <code>{{ url }}</code></p>
 </div>
 {% endif %}

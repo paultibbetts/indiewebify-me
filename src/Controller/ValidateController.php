@@ -288,24 +288,14 @@ final readonly class ValidateController
         }
 
         try {
-            $result = $validator->validate($url);
+            $report = $validator->validate($url);
         } catch (RuntimeException $e) {
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-entry.twig',
                 [
-                    'error' => $e->getMessage(),
-                ]
-            );
-        }
-
-        if ($result['entries'] === []) {
-            return $this->responder->withTemplate(
-                $response,
-                'validate-h-entry.twig',
-                [
                     'url' => $url,
-                    'error' => 'No h-entry was found on that page',
+                    'error' => $e->getMessage(),
                 ]
             );
         }
@@ -314,10 +304,8 @@ final readonly class ValidateController
             $response,
             'validate-h-entry.twig',
             [
-                'showResult' => true,
-                'properties' => $result['properties'],
-                'postType' => $result['postType'],
                 'url' => $url,
+                'report' => $report,
             ]
         );
     }

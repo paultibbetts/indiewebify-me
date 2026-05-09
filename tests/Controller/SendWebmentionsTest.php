@@ -44,7 +44,12 @@ final class SendWebmentionsTest extends WebTestCase
         $hEntryValidator->expects(self::once())
             ->method('validate')
             ->with($url)
-            ->willReturn(['entries' => []]);
+            ->willReturn([
+                'url' => $url,
+                'found' => false,
+                'postType' => null,
+                'checks' => [],
+            ]);
 
         $this->container()->set(ValidateHEntry::class, $hEntryValidator);
 
@@ -69,14 +74,10 @@ final class SendWebmentionsTest extends WebTestCase
             ->method('validate')
             ->with($url)
             ->willReturn([
-                'entries' => [
-                    [
-                        'type' => ['h-entry'],
-                        'properties' => [
-                            'name' => ['Example post with 2 mentions to send'],
-                        ],
-                    ],
-                ],
+                'url' => $url,
+                'found' => true,
+                'postType' => 'article',
+                'checks' => [],
             ]);
 
         $mentionSender->expects(self::once())

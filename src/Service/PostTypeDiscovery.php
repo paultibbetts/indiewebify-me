@@ -9,6 +9,8 @@ use BarnabyWalters\Mf2;
 
 class PostTypeDiscovery
 {
+    private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
+
     public function __construct()
     {
     }
@@ -95,10 +97,9 @@ class PostTypeDiscovery
     {
         return array_any(
             $this->propertyValues($entry, 'rsvp'),
-            // TODO: confirm strictness
             fn ($value) => in_array(
                 strtolower((string) $value),
-                ['yes', 'no', 'maybe', 'interested'],
+                self::VALID_RSVP_VALUES,
                 true
             )
         );

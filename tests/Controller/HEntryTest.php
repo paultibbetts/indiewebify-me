@@ -59,32 +59,49 @@ final class HEntryTest extends WebTestCase
         $author = 'Example Person';
         $photo = "{$url}photo.jpg";
 
-        $result = [
-            'entries' => [
-                [
-                    'type' => ['h-entry'],
-                    'properties' => [
-                        'these are not rendered' => true,
-                    ],
-                ],
-            ],
+        $report = [
+            'url' => $url,
+            'found' => true,
             'postType' => 'article',
-            'properties' => [
-                'name' => 'Example post',
-                'name_state' => 'valid',
-                'author' => [
-                    'is_h_card' => true,
-                    'name' => $author,
-                    'photo' => $photo,
-                    'url' => $url,
+            'checks' => [
+                [
+                    'id' => 'author',
+                    'label' => 'Author',
+                    'status' => 'pass',
+                    'state' => 'author.h-card.complete',
+                    'value' => [
+                        'type' => 'author-card',
+                        'name' => $author,
+                        'photo' => $photo,
+                        'url' => $url,
+                    ],
+                    'help' => null,
+                    'children' => [],
                 ],
-                'content' => $content,
-                'is_content_html' => true,
-                'published' => '2026-04-30T12:00:00+00:00',
-                'is_published_valid' => true,
-                'url' => $post,
-                'categories' => ['indieweb'],
-                'syndications' => [],
+                [
+                    'id' => 'content',
+                    'label' => 'Content',
+                    'status' => 'pass',
+                    'state' => 'content.html',
+                    'value' => [
+                        'type' => 'html-content',
+                        'text' => $content,
+                    ],
+                    'help' => null,
+                    'children' => [],
+                ],
+                [
+                    'id' => 'url',
+                    'label' => 'URL',
+                    'status' => 'pass',
+                    'state' => 'url.valid',
+                    'value' => [
+                        'type' => 'url',
+                        'url' => $post,
+                    ],
+                    'help' => null,
+                    'children' => [],
+                ],
             ],
         ];
 
@@ -93,7 +110,7 @@ final class HEntryTest extends WebTestCase
         $validator->expects(self::once())
             ->method('validate')
             ->with($url)
-            ->willReturn($result);
+            ->willReturn($report);
 
         $this->container()->set(ValidateHEntry::class, $validator);
 
@@ -108,15 +125,18 @@ final class HEntryTest extends WebTestCase
         self::assertStringContainsString($author, $payload);
         self::assertStringContainsString($photo, $payload);
         self::assertStringContainsString('article', $payload);
-        self::assertStringNotContainsString('these are not rendered', $payload);
+        self::assertStringContainsString($post, $payload);
     }
 
     public function testHEntryPageShowsNoHEntryError(): void
     {
         $url = 'https://example.com/';
 
-        $result = [
-            'entries' => [],
+        $report = [
+            'url' => $url,
+            'found' => false,
+            'postType' => null,
+            'checks' => [],
         ];
 
         $validator = $this->createMock(ValidateHEntry::class);
@@ -124,7 +144,7 @@ final class HEntryTest extends WebTestCase
         $validator->expects(self::once())
             ->method('validate')
             ->with($url)
-            ->willReturn($result);
+            ->willReturn($report);
 
         $this->container()->set(ValidateHEntry::class, $validator);
 
@@ -135,6 +155,6 @@ final class HEntryTest extends WebTestCase
         $payload = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('No h-entry was found on that page', $payload);
+        self::assertStringContainsString('No h-entry was found on https://example.com/', $payload);
     }
 }
