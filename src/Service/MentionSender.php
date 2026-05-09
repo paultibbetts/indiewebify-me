@@ -8,16 +8,18 @@ use IndieWeb\MentionClient;
 
 class MentionSender
 {
+    public function __construct(private MentionClient $client)
+    {
+    }
+
     /**
     * Sends webmentions.
     *
-    * @return int of mentions sent.
+    * @return int mentions sent
     */
     public function send(string $url): int
     {
-        $client = new MentionClient();
-
-        return $client->sendMentions($url);
+        return $this->client->sendMentions($url);
     }
 
 }
