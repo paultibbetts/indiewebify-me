@@ -105,6 +105,29 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('found', $check['status']);
         self::assertSame('interaction.target.valid', $check['state']);
         self::assertSame('url', $check['value']['type']);
+        self::assertSame([], $check['children']);
+    }
+
+    public function testReplyTargetKeepsWarningChildForNestedNonHCite(): void
+    {
+        $check = $this->checkFor($this->validate([
+            'name' => ['Reply'],
+            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
+            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
+            'in-reply-to' => [
+                [
+                    'type' => ['h-entry'],
+                    'properties' => [
+                        'url' => ['https://example.net/post'],
+                    ],
+                ],
+            ],
+        ]), 'in-reply-to');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('url', $check['value']['type']);
+        self::assertCount(1, $check['children']);
+        self::assertSame('interaction.microformat.has-warnings', $check['children'][0]['state']);
     }
 
     public function testReplyIntentDetectedButNoParsedUrl(): void

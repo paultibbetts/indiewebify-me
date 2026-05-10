@@ -488,10 +488,10 @@ class ValidateHEntry
 
         foreach ($values as $index => $value) {
             $child = $this->checkInteractionTargetValue($value, $propertyName, $label, $index + 1);
-            $children[] = $child;
 
-            if ($child['status'] !== self::FOUND) {
+            if ($child['status'] !== self::FOUND || $child['children'] !== []) {
                 $hasWarnings = true;
+                $children[] = $child;
             }
 
             if (($child['value']['type'] ?? null) === 'url' && isset($child['value']['url'])) {
