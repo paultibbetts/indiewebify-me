@@ -5,7 +5,7 @@
     info: 'text-bg-info'
 }[check.status]|default('text-bg-secondary') %}
 
-<div class="h-entry-check h-entry-check--{{ check.status }} my-3 ps-3 border-start">
+<div class="{{check.id == 'content' ? 'e-content' : ''}} my-3">
     <div class="d-flex align-items-center gap-2 mb-1">
         <b>{{ check.label }}</b>
 		{% if check.status != 'found' and check.id != 'name' %}
