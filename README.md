@@ -130,11 +130,11 @@ See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration..
 
 #### Planned
 
-- [ ] finish validate-h-entry
+- [x] finish validate-h-entry
 - - with minimal post type discovery
-- [ ] tests for validate-h-card
-- [ ] tests for validate-h-entry
-- [ ] tests for index page
+- [x] tests for validate-h-card
+- [x] tests for validate-h-entry
+- [x] tests for index page
 - [ ] tests for edge-cases
 - [ ] ensure frontend matches old version as much as possible
 - [ ] beginner-friendly documentation
