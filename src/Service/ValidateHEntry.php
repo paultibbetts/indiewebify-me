@@ -42,7 +42,6 @@ class ValidateHEntry
         }
 
         $entry = $result['entries'][0];
-        $postType = $this->ptd->discover($entry);
 
         $checks = [
             $this->checkName($entry),
@@ -91,7 +90,7 @@ class ValidateHEntry
         return [
             'url' => $url,
             'found' => true,
-            'postType' => $postType->value,
+            'postType' => $this->ptd->discover($entry)->value,
             'checks' => $checks,
         ];
     }
