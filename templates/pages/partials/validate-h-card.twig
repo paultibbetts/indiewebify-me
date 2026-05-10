@@ -138,11 +138,11 @@
 		<div class="my-2">
 			<b class="d-block">Note:</b>
 			{%~ if core.note ~%}
-			{{ core.note.0 }}
+				{{ core.note.0 }}
 			{%~ else ~%}
 			<div class="empty-property-block">
-				Do you have a brief bio? Add it to your h-card as a note property!
-				<code class="d-block">&lt;p class="p-note">…&lt;p></code>
+				<p>Do you have a brief bio? Add it to your h-card as a note property!</p>
+				<code class="d-block html-example">{{ '<p class="p-note">…</p>'|html_example|raw}}</code>
 			</div>
 			{%~ endif ~%}
 		</div>

@@ -70,13 +70,15 @@
     {% endif %}
 
     {% if check.help %}
-        {% if check.help.html %}
-            <p class="mb-2">{{ check.help.html|raw }}</p>
-        {% endif %}
+		<div class="empty-property-block">
+			{% if check.help.html %}
+				<p class="mb-2">{{ check.help.html|raw }}</p>
+			{% endif %}
 
-        {% if check.help.example %}
-            <code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code></pre>
-        {% endif %}
+			{% if check.help.example %}
+				<code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code></pre>
+			{% endif %}
+		</div>
     {% endif %}
 
     {% if check.status != 'found' and check.children %}
