@@ -52,3 +52,21 @@
 li {
 	line-height: 1.6;
 }
+
+/* HTML examples */
+
+.html-example {
+	color: #333;
+}
+
+.html-example .token-tag {
+	color: #bc4c00;
+}
+
+.html-example .token-attr {
+	color: #183691;
+}
+
+.html-example .token-string {
+	color: #a71d5d;
+}

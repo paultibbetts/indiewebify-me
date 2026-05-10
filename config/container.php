@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Twig\HtmlExampleExtension;
 use DI\Bridge\Slim\Bridge;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -12,7 +13,6 @@ use Slim\{
     Views\Twig,
     Views\TwigMiddleware
 };
-use Twig\TwigFunction;
 
 return [
     'settings' => fn () => require __DIR__ . '/settings.php',
@@ -29,14 +29,9 @@ return [
         $settings = $container->get('settings')['twig'];
         $twig = Twig::create($settings['paths'], $settings['options']);
 
-        // example of adding a Twig function
-        /*$environment = $twig->getEnvironment();
+        $environment = $twig->getEnvironment();
 
-        $environment->addFunction(
-            new TwigFunction('foo', function ($microformat, $property) {
-                return 'bar';
-            })
-        );*/
+        $environment->addExtension(new HtmlExampleExtension());
 
         return $twig;
     },
