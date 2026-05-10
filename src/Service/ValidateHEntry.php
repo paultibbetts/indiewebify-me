@@ -14,7 +14,7 @@ use Exception;
 
 class ValidateHEntry
 {
-    private const string PASS = 'pass';
+    private const string FOUND = 'found';
     private const string WARNING = 'warning';
     private const string INFO = 'info';
     private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
@@ -123,7 +123,7 @@ class ValidateHEntry
             );
         }
 
-        return $this->checkResult('name', 'Name', self::PASS, 'name.present', $this->textValue($name));
+        return $this->checkResult('name', 'Name', self::FOUND, 'name.present', $this->textValue($name));
     }
 
     /**
@@ -161,7 +161,7 @@ class ValidateHEntry
                     'example' => sprintf('<a class="p-author h-card" href="…">%s</a>', $authorName),
                 ],
                 [
-                    $this->checkResult('author.name', 'Author Name', self::PASS, 'author.name.present', $this->textValue($authorName)),
+                    $this->checkResult('author.name', 'Author Name', self::FOUND, 'author.name.present', $this->textValue($authorName)),
                     $this->checkResult('author.url', 'Author URL', self::INFO, 'author.url.unavailable-from-string'),
                     $this->checkResult('author.photo', 'Author Photo', self::INFO, 'author.photo.unavailable-from-string'),
                 ],
@@ -210,7 +210,7 @@ class ValidateHEntry
         return $this->checkResult(
             'author',
             'Author',
-            $complete ? self::PASS : self::WARNING,
+            $complete ? self::FOUND : self::WARNING,
             $complete ? 'author.h-card.complete' : 'author.h-card.partial',
             $value,
             children: [
@@ -225,7 +225,7 @@ class ValidateHEntry
                             'example' => '<span class="p-name">Your Name</span>',
                         ],
                     )
-                    : $this->checkResult('author.name', 'Author Name', self::PASS, 'author.name.present', $this->textValue($name)),
+                    : $this->checkResult('author.name', 'Author Name', self::FOUND, 'author.name.present', $this->textValue($name)),
                 $authorUrl === null
                     ? $this->checkResult(
                         'author.url',
@@ -237,7 +237,7 @@ class ValidateHEntry
                             'example' => '<a class="p-name u-url" href="/">Your Name</a>',
                         ],
                     )
-                    : $this->checkResult('author.url', 'Author URL', self::PASS, 'author.url.present', $this->urlValue($authorUrl)),
+                    : $this->checkResult('author.url', 'Author URL', self::FOUND, 'author.url.present', $this->urlValue($authorUrl)),
                 $photo === null
                     ? $this->checkResult(
                         'author.photo',
@@ -249,7 +249,7 @@ class ValidateHEntry
                             'example' => '<img class="u-photo" src="…" />',
                         ],
                     )
-                    : $this->checkResult('author.photo', 'Author Photo', self::PASS, 'author.photo.present', ['type' => 'image', 'url' => $photo]),
+                    : $this->checkResult('author.photo', 'Author Photo', self::FOUND, 'author.photo.present', ['type' => 'image', 'url' => $photo]),
             ],
         );
     }
@@ -288,7 +288,7 @@ class ValidateHEntry
             );
         }
 
-        return $this->checkResult('rsvp', 'RSVP', self::PASS, 'rsvp.valid', $this->textValue($normalized));
+        return $this->checkResult('rsvp', 'RSVP', self::FOUND, 'rsvp.valid', $this->textValue($normalized));
     }
 
     /**
@@ -320,7 +320,7 @@ class ValidateHEntry
                 ? (string) $content['html']
                 : null;
 
-            return $this->checkResult('content', 'Content', self::PASS, 'content.html', [
+            return $this->checkResult('content', 'Content', self::FOUND, 'content.html', [
                 'type' => 'html-content',
                 'html' => $html,
                 'text' => $text,
@@ -386,7 +386,7 @@ class ValidateHEntry
             );
         }
 
-        return $this->checkResult('published', 'Published', self::PASS, 'published.valid', $this->textValue($published));
+        return $this->checkResult('published', 'Published', self::FOUND, 'published.valid', $this->textValue($published));
     }
 
     /**
@@ -423,7 +423,7 @@ class ValidateHEntry
             );
         }
 
-        return $this->checkResult('url', 'URL', self::PASS, 'url.valid', $this->urlValue($url));
+        return $this->checkResult('url', 'URL', self::FOUND, 'url.valid', $this->urlValue($url));
     }
 
     /**
@@ -447,7 +447,7 @@ class ValidateHEntry
             );
         }
 
-        return $this->checkResult('category', 'Categories', self::PASS, 'category.present', [
+        return $this->checkResult('category', 'Categories', self::FOUND, 'category.present', [
             'type' => 'text-list',
             'items' => $categories,
         ]);
@@ -499,7 +499,7 @@ class ValidateHEntry
             $child = $this->checkInteractionTargetValue($value, $propertyName, $label, $index + 1);
             $children[] = $child;
 
-            if ($child['status'] !== self::PASS) {
+            if ($child['status'] !== self::FOUND) {
                 $hasWarnings = true;
             }
 
@@ -511,7 +511,7 @@ class ValidateHEntry
         return $this->checkResult(
             $propertyName,
             $label,
-            $hasWarnings ? self::WARNING : self::PASS,
+            $hasWarnings ? self::WARNING : self::FOUND,
             $hasWarnings ? 'interaction.target.has-warnings' : 'interaction.target.valid',
             $this->urlListValue($urls),
             children: $children,
@@ -563,7 +563,7 @@ class ValidateHEntry
                 );
             }
 
-            return $this->checkResult($id, $childLabel, self::PASS, 'interaction.url.valid', $this->urlValue($url));
+            return $this->checkResult($id, $childLabel, self::FOUND, 'interaction.url.valid', $this->urlValue($url));
         }
 
         if (!$this->isMicroformat($value)) {
@@ -622,7 +622,7 @@ class ValidateHEntry
         return $this->checkResult(
             $id,
             $childLabel,
-            $children === [] ? self::PASS : self::WARNING,
+            $children === [] ? self::FOUND : self::WARNING,
             $children === [] ? 'interaction.microformat.valid' : 'interaction.microformat.has-warnings',
             $url === null ? null : ($this->looksLikeUrl($url) ? $this->urlValue($url) : $this->textValue($url)),
             children: $children,

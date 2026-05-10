@@ -46,7 +46,7 @@ final class ValidateHEntryChecksTest extends TestCase
             'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
         ]), 'author');
 
-        self::assertSame('pass', $check['status']);
+        self::assertSame('found', $check['status']);
         self::assertSame('author.h-card.complete', $check['state']);
         self::assertSame('author-card', $check['value']['type']);
     }
@@ -102,7 +102,7 @@ final class ValidateHEntryChecksTest extends TestCase
             'in-reply-to' => ['https://example.net/post'],
         ]), 'in-reply-to');
 
-        self::assertSame('pass', $check['status']);
+        self::assertSame('found', $check['status']);
         self::assertSame('interaction.target.valid', $check['state']);
         self::assertSame('url', $check['value']['type']);
     }
@@ -131,7 +131,7 @@ final class ValidateHEntryChecksTest extends TestCase
             'content' => [['html' => '<p>I will be there</p>', 'value' => 'I will be there']],
         ]), 'rsvp');
 
-        self::assertSame('pass', $check['status']);
+        self::assertSame('found', $check['status']);
         self::assertSame('rsvp.valid', $check['state']);
         self::assertSame('yes', $check['value']['text']);
     }

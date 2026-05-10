@@ -1,5 +1,5 @@
 {% set statusClass = {
-    pass: 'text-bg-success',
+    found: 'text-bg-success',
     warning: 'text-bg-warning',
     fail: 'text-bg-danger',
     info: 'text-bg-info'
@@ -8,7 +8,7 @@
 <div class="h-entry-check h-entry-check--{{ check.status }} my-3 ps-3 border-start">
     <div class="d-flex align-items-center gap-2 mb-1">
         <b>{{ check.label }}</b>
-		{% if check.status != 'pass' %}
+		{% if check.status != 'found' and check.id != 'name' %}
 			<span class="badge {{ statusClass }}">{{ check.status|replace({'_': ' '})|title }}</span>
 		{% endif %}
     </div>
@@ -79,7 +79,7 @@
         {% endif %}
     {% endif %}
 
-    {% if check.status != 'pass' and check.children %}
+    {% if check.status != 'found' and check.children %}
         <div class="mt-2 ms-3">
             {% for child in check.children %}
                 {% include 'pages/partials/h-entry-check.twig' with { check: child } only %}
