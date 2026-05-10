@@ -36,7 +36,7 @@
 		{%- set h_card = cards.0 -%}
 
 		{%- set intro_phrase = 'An h-card was found on your site! Consider ' -%}
-		{%- if cards > 1 -%}
+		{%- if cards|length > 1 -%}
 			{%- set intro_phrase = 'Multiple h-cards were found on your site! Consider only having one and ' -%}
 		{%- endif -%}
 
