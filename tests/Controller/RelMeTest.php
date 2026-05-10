@@ -13,10 +13,10 @@ final class RelMeTest extends WebTestCase
 {
     public function testRelMePageLoadsWithoutQuery(): void
     {
-        $response = $this->get('/validate-rel-me');
+        $response = $this->get('/validate-rel-me/');
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
-        $query = '//form[contains(@action, "/validate-rel-me")]//input[@name="url"]';
+        $query = '//form[contains(@action, "/validate-rel-me/")]//input[@name="url"]';
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(1, $xpath->query($query)->length);
@@ -26,9 +26,9 @@ final class RelMeTest extends WebTestCase
     {
         $website = 'example.com';
         $normalized = IndieWeb\normaliseUrl("http://{$website}");
-        $expected = '/validate-rel-me?' . http_build_query(['url' => $normalized]);
+        $expected = '/validate-rel-me/?' . http_build_query(['url' => $normalized]);
 
-        $response = $this->get("/validate-rel-me?url={$website}");
+        $response = $this->get("/validate-rel-me/?url={$website}");
 
         self::assertSame(302, $response->getStatusCode());
         self::assertSame($expected, $response->getHeaderLine('Location'));
@@ -36,7 +36,7 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMeCheckRequiresBothUrls(): void
     {
-        $response = $this->get('/rel-me-check?' . http_build_query([
+        $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => IndieWeb\normaliseUrl('example'),
         ]));
         $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
@@ -59,7 +59,7 @@ final class RelMeTest extends WebTestCase
 
         $this->container()->set(RelMe::class, $relMe);
 
-        $response = $this->get('/rel-me-check?' . http_build_query([
+        $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $website,
             'url2' => $profile,
         ]));
@@ -106,7 +106,7 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/rel-me-check?' . http_build_query([
+        $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $website,
             'url2' => $profile,
         ]));
@@ -146,7 +146,7 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/validate-rel-me?' . http_build_query([
+        $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
         ]));
         $payload = (string) $response->getBody();
@@ -181,7 +181,7 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/validate-rel-me?' . http_build_query([
+        $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
         ]));
         $payload = (string) $response->getBody();
@@ -218,7 +218,7 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/rel-me-check?' . http_build_query([
+        $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $website,
             'url2' => $profile,
         ]));
@@ -264,7 +264,7 @@ final class RelMeTest extends WebTestCase
         $this->container()->set(RelMe::class, $relMe);
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/rel-me-check?' . http_build_query([
+        $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $https,
             'url2' => $profile,
         ]));

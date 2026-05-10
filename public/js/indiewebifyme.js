@@ -6,9 +6,9 @@ function ready(fn) {
 	}
 }
 
-ready(function () {
+ready(function() {
 	async function checkRelMe(url1, url2) {
-		const response = await fetch(`/rel-me-check?url1=${url1}&url2=${url2}`);
+		const response = await fetch(`/rel-me-check/?url1=${url1}&url2=${url2}`);
 		return response.json();
 	}
 
@@ -25,7 +25,7 @@ ready(function () {
 			let spinner = relMeResults[i].querySelector(".spinner-border");
 			let badge = relMeResults[i].querySelector(".badge");
 
-			checkRelMe(results_url, url.href).then(function (json) {
+			checkRelMe(results_url, url.href).then(function(json) {
 				// console.log(json);
 				badge.textContent = json.response;
 				if (json.status != 200) {

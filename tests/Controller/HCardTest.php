@@ -12,10 +12,10 @@ final class HCardTest extends WebTestCase
 {
     public function testHCardPageLoadsWithoutQuery(): void
     {
-        $response = $this->get('/validate-h-card');
+        $response = $this->get('/validate-h-card/');
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
-        $query = '//form[contains(@action, "/validate-h-card")]//input[@name="url"]';
+        $query = '//form[contains(@action, "/validate-h-card/")]//input[@name="url"]';
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(1, $xpath->query($query)->length);
@@ -23,7 +23,7 @@ final class HCardTest extends WebTestCase
 
     public function testHCardPageRequiresAUrl(): void
     {
-        $response = $this->get('/validate-h-card?' . http_build_query([
+        $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => '',
         ]));
 
@@ -38,7 +38,7 @@ final class HCardTest extends WebTestCase
         $url = 'example.com';
         $expected = "http://{$url}/";
 
-        $response = $this->get('/validate-h-card?' . http_build_query([
+        $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => $url,
         ]));
 
@@ -48,7 +48,7 @@ final class HCardTest extends WebTestCase
         $parts = parse_url($location);
         parse_str($parts['query'] ?? '', $query);
 
-        self::assertSame('/validate-h-card', $parts['path']);
+        self::assertSame('/validate-h-card/', $parts['path']);
         self::assertSame($expected, $query['url'] ?? null);
     }
 
@@ -85,7 +85,7 @@ final class HCardTest extends WebTestCase
 
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->getFollowingRedirects('/validate-h-card?' . http_build_query([
+        $response = $this->getFollowingRedirects('/validate-h-card/?' . http_build_query([
             'url' => $url,
         ]));
 
@@ -118,7 +118,7 @@ final class HCardTest extends WebTestCase
 
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/validate-h-card?' . http_build_query([
+        $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => $url,
         ]));
 
@@ -144,7 +144,7 @@ final class HCardTest extends WebTestCase
 
         $this->container()->set(Microformats::class, $microformats);
 
-        $response = $this->get('/validate-h-card?' . http_build_query([
+        $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => $url,
         ]));
 

@@ -12,10 +12,10 @@ final class SendWebmentionsTest extends WebTestCase
 {
     public function testSendWebmentionsPageShowsForm(): void
     {
-        $response = $this->get('/send-webmentions');
+        $response = $this->get('/send-webmentions/');
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
-        $query = '//form[contains(@action, "/send-webmentions")]//input[@name="url"]';
+        $query = '//form[contains(@action, "/send-webmentions/")]//input[@name="url"]';
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(1, $xpath->query($query)->length);
@@ -25,7 +25,7 @@ final class SendWebmentionsTest extends WebTestCase
     {
         $url = '';
 
-        $response = $this->post('/send-webmentions', [
+        $response = $this->post('/send-webmentions/', [
             'url' => $url,
         ]);
 
@@ -53,7 +53,7 @@ final class SendWebmentionsTest extends WebTestCase
 
         $this->container()->set(ValidateHEntry::class, $hEntryValidator);
 
-        $response = $this->post('/send-webmentions', [
+        $response = $this->post('/send-webmentions/', [
             'url' => $url,
         ]);
 
@@ -88,7 +88,7 @@ final class SendWebmentionsTest extends WebTestCase
         $this->container()->set(ValidateHEntry::class, $hEntryValidator);
         $this->container()->set(MentionSender::class, $mentionSender);
 
-        $response = $this->post('/send-webmentions', [
+        $response = $this->post('/send-webmentions/', [
             'url' => $url,
         ]);
 

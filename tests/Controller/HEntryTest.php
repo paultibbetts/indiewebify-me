@@ -11,10 +11,10 @@ final class HEntryTest extends WebTestCase
 {
     public function testHEntryPageLoadsWithoutQuery(): void
     {
-        $response = $this->get('/validate-h-entry');
+        $response = $this->get('/validate-h-entry/');
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
-        $query = '//form[contains(@action, "/validate-h-entry")]//input[@name="url"]';
+        $query = '//form[contains(@action, "/validate-h-entry/")]//input[@name="url"]';
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(1, $xpath->query($query)->length);
@@ -22,7 +22,7 @@ final class HEntryTest extends WebTestCase
 
     public function testHEntryPageRequiresAUrl(): void
     {
-        $response = $this->get('/validate-h-entry?' . http_build_query([
+        $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => '',
         ]));
 
@@ -37,7 +37,7 @@ final class HEntryTest extends WebTestCase
         $url = 'example.com/post';
         $expected = "http://{$url}";
 
-        $response = $this->get('/validate-h-entry?' . http_build_query([
+        $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => $url,
         ]));
 
@@ -47,7 +47,7 @@ final class HEntryTest extends WebTestCase
         $parts = parse_url($location);
         parse_str($parts['query'] ?? '', $query);
 
-        self::assertSame('/validate-h-entry', $parts['path']);
+        self::assertSame('/validate-h-entry/', $parts['path']);
         self::assertSame($expected, $query['url'] ?? null);
     }
 
@@ -114,7 +114,7 @@ final class HEntryTest extends WebTestCase
 
         $this->container()->set(ValidateHEntry::class, $validator);
 
-        $response = $this->get('/validate-h-entry?' . http_build_query([
+        $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => $url,
         ]));
 
@@ -148,7 +148,7 @@ final class HEntryTest extends WebTestCase
 
         $this->container()->set(ValidateHEntry::class, $validator);
 
-        $response = $this->get('/validate-h-entry?' . http_build_query([
+        $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => $url,
         ]));
 
