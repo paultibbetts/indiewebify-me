@@ -43,16 +43,13 @@
                         <img src="{{ value.photo }}" alt="" class="mw-100">
                     </div>
                 {% endif %}
-
                 {% if value.name %}
 					{% if value.url %}
-					<div><a href="{{ value.url }}">{{ value.name }}</a></div>
+						<div><a href="{{ value.url }}">{{ value.name }}</a></div>
 					{% else %}
 						<div>{{ value.name }}</div>
 					{% endif %}
-                {% endif %}
-
-                {% if value.url and not value.name %}
+                {% elseif value.url %}
                     <div><a href="{{ value.url }}">{{ value.url }}</a></div>
                 {% endif %}
             </div>
@@ -76,7 +73,7 @@
 			{% endif %}
 
 			{% if check.help.example %}
-				<code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code></pre>
+				<code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code>
 			{% endif %}
 		</div>
     {% endif %}

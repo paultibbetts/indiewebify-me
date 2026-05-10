@@ -33,7 +33,7 @@ final class PostTypeDiscoveryTest extends TestCase
     {
         return [
             'article' => [
-                '<h1 class="p-name">Header</h1><div class="e-content">Content</div>',
+                '<h1 class="p-name">Title</h1><div class="e-content">Content</div>',
                 PostType::Article,
             ],
             'like' => [
@@ -65,7 +65,7 @@ final class PostTypeDiscoveryTest extends TestCase
                 PostType::RSVP,
             ],
             'video' => [
-                '<video class="u-video" src="https://example.com/video.mpg">a video</video>',
+                '<video class="u-video" src="https://example.com/video.mpg">warning text only for browsers that do not support the video tag</video>',
                 PostType::Video,
             ],
 
