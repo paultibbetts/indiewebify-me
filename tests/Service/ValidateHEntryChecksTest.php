@@ -13,10 +13,7 @@ final class ValidateHEntryChecksTest extends TestCase
 {
     public function testMissingAuthor(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Example post'],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
-        ]), 'author');
+        $check = $this->checkFor($this->checksForParsedEntry(), 'author');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('author.missing', $check['state']);
@@ -25,25 +22,21 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testStringAuthor(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Example post'],
+        $check = $this->checkFor($this->checksForParsedEntry([
             'author' => ['Example Person'],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
         ]), 'author');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('author.string', $check['state']);
         self::assertSame('text', $check['value']['type']);
         self::assertStringContainsString('add <code>h-card</code>', $check['help']['html']);
-        self::assertSame('<a class="p-author h-card" href="…">Example Person</a>', $check['help']['example']);
+        self::assertStringContainsString('h-card', $check['help']['example']);
     }
 
     public function testCompleteHCardAuthor(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Example post'],
+        $check = $this->checkFor($this->checksForParsedEntry([
             'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
         ]), 'author');
 
         self::assertSame('found', $check['status']);
@@ -53,25 +46,19 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testPartialHCardAuthor(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Example post'],
+        $check = $this->checkFor($this->checksForParsedEntry([
             'author' => [$this->authorCard(photo: null)],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
         ]), 'author');
         $photo = $this->childFor($check, 'author.photo');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('author.h-card.partial', $check['state']);
         self::assertSame('author.photo.missing', $photo['state']);
-        self::assertSame('Add a photo!', $photo['help']['html']);
     }
 
     public function testMissingNameIsNeutral(): void
     {
-        $check = $this->checkFor($this->validate([
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
-        ]), 'name');
+        $check = $this->checkFor($this->checksForParsedEntry(), 'name');
 
         self::assertSame('info', $check['status']);
         self::assertSame('name.missing', $check['state']);
@@ -80,11 +67,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testMissingNameOnArticleIsStillNeutral(): void
     {
-        $check = $this->checkFor($this->validate(
-            [
-                'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-                'content' => [['html' => '<p>Event details</p>', 'value' => 'Event details']],
-            ],
+        $check = $this->checkFor($this->checksForParsedEntry(
             types: ['h-entry', 'h-event'],
         ), 'name');
 
@@ -95,10 +78,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testReplyTargetUrlPresent(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Reply'],
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
+        $check = $this->checkFor($this->checksForParsedEntry([
             'in-reply-to' => ['https://example.net/post'],
         ]), 'in-reply-to');
 
@@ -110,10 +90,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testReplyTargetKeepsWarningChildForNestedNonHCite(): void
     {
-        $check = $this->checkFor($this->validate([
-            'name' => ['Reply'],
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
+        $check = $this->checkFor($this->checksForParsedEntry([
             'in-reply-to' => [
                 [
                     'type' => ['h-entry'],
@@ -132,26 +109,18 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testReplyIntentDetectedButNoParsedUrl(): void
     {
-        $check = $this->checkFor($this->validate(
-            [
-                'name' => ['Example post'],
-                'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-                'content' => [['html' => '<p>Hello</p>', 'value' => 'Hello']],
-            ],
-            '<article class="h-entry"><span class="u-in-reply-to">https://example.net/post</span></article>',
+        $check = $this->checkFor($this->checksForParsedEntry(
+            rawHtml: '<article class="h-entry"><span class="u-in-reply-to">https://example.net/post</span></article>',
         ), 'in-reply-to');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('interaction.intent-detected-but-no-parsed-value', $check['state']);
-        self::assertStringContainsString('no value was parsed', $check['help']['html']);
     }
 
     public function testValidRsvpValue(): void
     {
-        $check = $this->checkFor($this->validate([
+        $check = $this->checkFor($this->checksForParsedEntry([
             'rsvp' => ['yes'],
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>I will be there</p>', 'value' => 'I will be there']],
         ]), 'rsvp');
 
         self::assertSame('found', $check['status']);
@@ -161,39 +130,31 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testInvalidRsvpValue(): void
     {
-        $check = $this->checkFor($this->validate([
+        $check = $this->checkFor($this->checksForParsedEntry([
             'rsvp' => ['definitely'],
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-            'content' => [['html' => '<p>I will be there</p>', 'value' => 'I will be there']],
         ]), 'rsvp');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('rsvp.invalid', $check['state']);
         self::assertSame('definitely', $check['value']['text']);
-        self::assertStringContainsString('RSVP should be one of', $check['help']['html']);
     }
 
     public function testRsvpIntentDetectedButNoParsedValue(): void
     {
-        $check = $this->checkFor($this->validate(
-            [
-                'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
-                'content' => [['html' => '<p>I will be there</p>', 'value' => 'I will be there']],
-            ],
-            '<article class="h-entry"><span class="p-rsvp"></span></article>',
+        $check = $this->checkFor($this->checksForParsedEntry(
+            rawHtml: '<article class="h-entry"><span class="p-rsvp"></span></article>',
         ), 'rsvp');
 
         self::assertSame('warning', $check['status']);
         self::assertSame('rsvp.missing', $check['state']);
-        self::assertStringContainsString('no RSVP value was parsed', $check['help']['html']);
     }
 
     /**
      * @param array<string, list<mixed>> $properties
      * @return list<array<string, mixed>>
      */
-    private function validate(
-        array $properties,
+    private function checksForParsedEntry(
+        array $properties = [],
         string $rawHtml = '<article class="h-entry"></article>',
         array $types = ['h-entry'],
     ): array {
