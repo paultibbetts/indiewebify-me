@@ -49,22 +49,10 @@ class ValidateHEntry
         ];
 
         $interactionChecks = [
-            [
-                'class' => 'bookmark-of',
-                'label' => 'Bookmark Of',
-            ],
-            [
-                'class' => 'in-reply-to',
-                'label' => 'In Reply To',
-            ],
-            [
-                'class' => 'like-of',
-                'label' => 'Like Of',
-            ],
-            [
-                'class' => 'repost-of',
-                'label' => 'Repost Of',
-            ],
+            ['class' => 'bookmark-of', 'label' => 'Bookmark Of',],
+            ['class' => 'in-reply-to', 'label' => 'In Reply To',],
+            ['class' => 'like-of', 'label' => 'Like Of',],
+            ['class' => 'repost-of', 'label' => 'Repost Of',],
         ];
 
         foreach ($interactionChecks as $check) {
@@ -334,7 +322,11 @@ class ValidateHEntry
                 'content.plain',
                 $this->textValue(trim((string) $content)),
                 [
-                    'html' => 'It looks like your content is marked up as a plain property — consider using <code>class="e-content"</code> so that consumers can parse rich text (i.e. with images and formatting)',
+                    'html' => <<<'HTML'
+                    It looks like your content is marked up as a plain property
+                    — consider using <code>class="e-content"</code> so that
+                    consumers can parse rich text (i.e. with images and formatting)
+                    HTML,
                 ],
             );
         }
