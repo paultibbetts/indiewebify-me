@@ -23,7 +23,7 @@
 		{% endif %}
 		{% if error == 'no-h-entry' %}
 			<p>No h-entry was found on {{ url }}!</p>
-			<p>When you send webmentions from a page, the pages you’ve mentioned will usually fetch it and parse it for h-entry markup, to display as comments or notifications. You should <a href="/validate-h-entry/?url=<?= htmlspecialchars(urlencode(htmlspecialchars_decode($url))) ?>">mark up your posts with h-entry</a> so the people you mention can do something useful with the information.</p>
+			<p>When you send webmentions from a page, the pages you’ve mentioned will usually fetch it and parse it for h-entry markup, to display as comments or notifications. You should <a href="{{ url_for('validate_h_entry', {}, { url: url }) }}">mark up your posts with h-entry</a> so the people you mention can do something useful with the information.</p>
 		{% endif %}
 	</div>
 {% endif %}
