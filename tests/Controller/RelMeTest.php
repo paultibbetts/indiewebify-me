@@ -276,4 +276,13 @@ final class RelMeTest extends WebTestCase
         self::assertTrue($payload['pass']);
         self::assertFalse($payload['secure']);
     }
+
+    public function testRelMeCheckHasPublicCors(): void
+    {
+        $response = $this->get('/rel-me-check/?' . http_build_query([
+            'url1' => 'example',
+        ]));
+
+        self::assertSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
 }

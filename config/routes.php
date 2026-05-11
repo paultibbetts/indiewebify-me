@@ -9,6 +9,7 @@ use App\Controller\{
     ValidateController,
     WebmentionController
 };
+use App\Middleware\PublicCorsMiddleware;
 use Slim\App;
 
 return function (App $app) {
@@ -16,7 +17,8 @@ return function (App $app) {
         ->setName('index');
 
     $app->get('/rel-me-check/', [ValidateController::class, 'rel_me_check'])
-        ->setName('rel_me_check');
+        ->setName('rel_me_check')
+        ->add(PublicCorsMiddleware::class);
 
     $app->get('/validate-rel-me/', [ValidateController::class, 'rel_me'])
         ->setName('validate_rel_me');
