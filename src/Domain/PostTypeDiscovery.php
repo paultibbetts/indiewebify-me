@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Domain;
 
 use App\Domain\PostType;
+use App\Service\Microformats;
 use BarnabyWalters\Mf2;
 
 class PostTypeDiscovery
 {
     private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
 
-    public function __construct()
+    public function __construct(private Microformats $microformats)
     {
     }
 
@@ -96,7 +97,7 @@ class PostTypeDiscovery
     private function hasValidRsvp(array $entry): bool
     {
         return array_any(
-            $this->propertyValues($entry, 'rsvp'),
+            $this->microformats->propertyValues($entry, 'rsvp'),
             fn ($value) => in_array(
                 strtolower((string) $value),
                 self::VALID_RSVP_VALUES,
@@ -105,38 +106,9 @@ class PostTypeDiscovery
         );
     }
 
-    /**
-     * @return list<string>
-     */
-    private function propertyValues(array $entry, string $property): array
-    {
-        return $this->normalizePlaintextValues(Mf2\getPlaintextArray($entry, $property, []));
-    }
-
-    /**
-     * @param mixed $values
-     * @return list<string>
-     */
-    private function normalizePlaintextValues(mixed $values): array
-    {
-        if (!is_array($values)) {
-            return [];
-        }
-
-        $plaintext = [];
-
-        foreach ($values as $value) {
-            if (is_scalar($value) && trim((string) $value) !== '') {
-                $plaintext[] = trim((string) $value);
-            }
-        }
-
-        return $plaintext;
-    }
-
     private function firstNonEmptyValue(array $entry, string $property): ?string
     {
-        return $this->propertyValues($entry, $property)[0] ?? null;
+        return $this->microformats->propertyValues($entry, $property)[0] ?? null;
     }
 
     private function normalizePostTypeText(string $value): string

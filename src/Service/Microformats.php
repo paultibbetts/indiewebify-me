@@ -103,6 +103,35 @@ class Microformats
     }
 
     /**
+     * @return list<string>
+     */
+    public function propertyValues(array $entry, string $property): array
+    {
+        return $this->normalizePlaintextValues(Mf2Helper\getPlaintextArray($entry, $property, []));
+    }
+
+    /**
+     * @param mixed $values
+     * @return list<string>
+     */
+    private function normalizePlaintextValues(mixed $values): array
+    {
+        if (!is_array($values)) {
+            return [];
+        }
+
+        $plaintext = [];
+
+        foreach ($values as $value) {
+            if (is_scalar($value) && trim((string) $value) !== '') {
+                $plaintext[] = trim((string) $value);
+            }
+        }
+
+        return $plaintext;
+    }
+
+    /**
     *  @return array{
     *       core: array<string, list<string>>,
     *       additional: array<string, list<string>>
@@ -117,11 +146,11 @@ class Microformats
         $additional = [];
 
         foreach ($this->core_card_properties as $name) {
-            $core[$name] = Mf2Helper\getPlaintextArray($h_card, $name);
+            $core[$name] = $this->propertyValues($h_card, $name);
         }
 
-        foreach ($this->additional_card_properties as $key => $name) {
-            $additional[$name] = Mf2Helper\getPlaintextArray($h_card, $key);
+        foreach ($this->additional_card_properties as $name => $label) {
+            $additional[$label] = $this->propertyValues($h_card, $name);
         }
 
         $core = array_filter($core);
