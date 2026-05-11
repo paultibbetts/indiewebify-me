@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Responder\Responder;
 use App\Service\MentionSender;
 use App\Service\ValidateHEntry;
+use App\Support\UrlNormalizer;
 use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface
@@ -65,7 +66,9 @@ final readonly class WebmentionController
             );
         }
 
-        $numSent = $mentionSender->send($url);
+        $numSent = $mentionSender->send(
+            UrlNormalizer::normalize($url)
+        );
 
         return $this->responder->withTemplate(
             $response,

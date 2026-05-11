@@ -9,6 +9,7 @@ use App\Responder\Responder;
 use App\Service\Microformats;
 use App\Service\RelMe;
 use App\Service\ValidateHEntry;
+use App\Support\UrlNormalizer;
 use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface
@@ -45,8 +46,8 @@ final readonly class ValidateController
             return $this->responder->withJson($response, $response_data);
         }
 
-        $url1 = $this->normalizeFullUrl($url1);
-        $url2 = $this->normalizeFullUrl($url2);
+        $url1 = UrlNormalizer::normalize($url1);
+        $url2 = UrlNormalizer::normalize($url2);
         $is_url_https = parse_url((string) $url1, PHP_URL_SCHEME) == 'https';
 
         [$inbound_url, $secure, $previous] = $relMe->documentUrl($url2);
@@ -97,7 +98,7 @@ final readonly class ValidateController
         }
 
         # validate rel-me for URL in query parameter
-        $url = $this->normalizeFullUrl($input_url);
+        $url = UrlNormalizer::normalize($input_url);
         if (!$url) {
             return $this->responder->withTemplate(
                 $response,
@@ -180,7 +181,7 @@ final readonly class ValidateController
 
         }
         # validate h-card for URL in query parameter
-        $url = $this->normalizeFullUrl($input_url);
+        $url = UrlNormalizer::normalize($input_url);
 
         if ($input_url !== $url) {
             # ensure normalized URL in query parameter by redirecting
@@ -275,7 +276,7 @@ final readonly class ValidateController
         }
 
         # validate h-card for URL in query parameter
-        $url = $this->normalizeFullUrl($input_url);
+        $url = UrlNormalizer::normalize($input_url);
 
         if ($input_url !== $url) {
             # ensure normalized URL in query parameter by redirecting
@@ -308,22 +309,5 @@ final readonly class ValidateController
                 'report' => $report,
             ]
         );
-    }
-
-    /**
-     * Normalize a full URL
-     * Adds default scheme "http://" if no scheme in $url
-     *
-     * @todo this could be moved into a helper class?
-     */
-    private function normalizeFullUrl(string $url): ?string
-    {
-        $starts_http = stripos($url, 'http://') === 0;
-        $starts_https = stripos($url, 'https://') === 0;
-        if (!$starts_http && !$starts_https) {
-            $url = 'http://' . $url;
-        }
-
-        return IndieWeb\normaliseUrl($url);
     }
 }
