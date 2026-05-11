@@ -1,11 +1,16 @@
+{% set no_h_entry_example %}
+<article class="h-entry">
+	<div class="e-content p-name">Hello world! This is my first indieweb post.</div>
+	<a class="u-url" href="https://example.com/my-first-post">
+		Published <time class="dt-published">{{ now|date("Y-m-d H:i:sO") }}</time>
+	</a>
+</article>
+{% endset %}
+
 <h3>Check your <b>posts</b> are marked up with <a href="https://microformats.org/wiki/h-entry" target="_blank">h-entry</a>:</h3>
 
 {% if error %}
     <div class="alert alert-danger"> {{ error }} </div>
-{% endif %}
-
-{% if report is defined and not report.found %}
-    <div class="alert alert-danger"> No h-entry was found on {{ report.url }} </div>
 {% endif %}
 
 <form method="get" action="{{ url_for('validate_h_entry') }}" class="mb-3">
@@ -18,6 +23,31 @@
         </div>
     </div>
 </form>
+
+{% if report is defined and not report.found %}
+    <div class="alert alert-warning">
+		<h4 class="mb-4">No h-entry found</h4>
+		<p>Adding h-entry markup to posts on your site allows computers to understand them as easily as humans can, without publishing separate copies.</p>
+		<p>All you need to do is add microformats2 h-entry classnames, for example:</p>
+		<pre class="p-2"><code class="html-example">{{ no_h_entry_example|html_example|raw}}</code></pre>
+	</div>
+	<div>
+		<p>Your h-entries should have, at minimum, the following properties:</p>
+
+		<ul>
+			<li><code>e-content</code> — the main content of the post</li>
+			<li><code>p-name</code> — if your post is an article with a name, use this classname.</li>
+			<li><code>dt-published</code> — the datetime the post was published at, in ISO8601 format, with a timezone</li>
+			<li><code>u-url</code> — the canonical URL of the post, especially important on pages listing multiple posts</li>
+		</ul>
+
+		<p>It’s a common convention for the published datetime to be a link to the post itself, but they can be separate if you want.</p>
+
+		<p>There should also be some way to discover the author of the post — either link to your homepage (which should have your h-card on it) from anywhere within the body of the page with <code>rel=author</code>, or optionally embed a <code>p-author h-card</code> in the h-entry.</p>
+
+		<p>The web is an expressive medium, and as such there are many other properties which you can add to your posts. Check out the <a href="http://microformats.org/wiki/h-entry">h-entry documentation</a> for a full list.</p>
+	</div>
+{% endif %}
 
 {% if report is defined and report.found %}
     <div class="result alert alert-success my-3">
