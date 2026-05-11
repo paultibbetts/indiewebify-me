@@ -26,5 +26,4 @@ final class SiteHintsDetectorTest extends TestCase
 
         self::assertSame('hugo', $hints['software']);
     }
-
 }

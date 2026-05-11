@@ -17,18 +17,18 @@ abstract class WebTestCase extends TestCase
     protected App $app;
 
     /**
-    * Runs before every test.
-    *
-    * Sets $app to a fresh instance of the application.
-    */
+     * Runs before every test.
+     *
+     * Sets $app to a fresh instance of the application.
+     */
     protected function setUp(): void
     {
         $this->app = require dirname(__DIR__, 1) . '/config/bootstrap.php';
     }
 
     /**
-    * HTTP get for web tests.
-    */
+     * HTTP get for web tests.
+     */
     protected function get(string $uri): ResponseInterface
     {
         $request = new ServerRequestFactory()
@@ -87,5 +87,4 @@ abstract class WebTestCase extends TestCase
 
         return $container;
     }
-
 }

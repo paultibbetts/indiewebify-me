@@ -6,9 +6,9 @@ namespace App\Controller;
 
 use App\Http\Client;
 use App\Responder\Responder;
-use App\Service\WebmentionSender;
 use App\Service\Microformats;
 use App\Service\ValidateHEntry;
+use App\Service\WebmentionSender;
 use App\Support\UrlNormalizer;
 use Psr\Http\Message\{
     ResponseInterface,
@@ -34,8 +34,8 @@ final readonly class WebmentionController
     }
 
     /**
-    *  Sends webmentions.
-    */
+     *  Sends webmentions.
+     */
     public function send(
         ServerRequestInterface $request,
         ResponseInterface $response,

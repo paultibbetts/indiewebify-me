@@ -108,5 +108,4 @@ final class SendWebmentionsTest extends WebTestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('sent 2 webmentions', $payload);
     }
-
 }

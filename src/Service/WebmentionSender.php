@@ -13,13 +13,12 @@ class WebmentionSender
     }
 
     /**
-    * Sends webmentions.
-    *
-    * @return int mentions sent
-    */
+     * Sends webmentions.
+     *
+     * @return int mentions sent
+     */
     public function send(string $url): int
     {
         return $this->client->sendMentions($url);
     }
-
 }

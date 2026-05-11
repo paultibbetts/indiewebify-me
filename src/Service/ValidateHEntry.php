@@ -83,6 +83,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkName(array $entry): array
@@ -113,6 +114,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkAuthor(array $entry): array
@@ -278,6 +280,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkContent(array $entry): array
@@ -343,6 +346,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkPublished(array $entry): array
@@ -380,6 +384,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkUrl(array $entry): array
@@ -417,6 +422,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkCategory(array $entry): array
@@ -444,6 +450,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return array<string, mixed>
      */
     private function checkInteractionTarget(
@@ -620,6 +627,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return list<mixed>
      */
     private function allProperties(array $entry, string $name): array
@@ -655,6 +663,7 @@ class ValidateHEntry
 
     /**
      * @param array<string, mixed> $entry
+     *
      * @return list<string>
      */
     private function allPlaintext(array $entry, string $name): array
@@ -695,6 +704,7 @@ class ValidateHEntry
     {
         try {
             new DateTimeImmutable($date);
+
             return true;
         } catch (Exception) {
             return false;
@@ -790,6 +800,7 @@ class ValidateHEntry
 
     /**
      * @param list<string> $urls
+     *
      * @return array<string, mixed>|null
      */
     private function urlListValue(array $urls): ?array

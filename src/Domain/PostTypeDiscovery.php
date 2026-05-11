@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain;
 
-use App\Domain\PostType;
 use App\Service\Microformats;
 use BarnabyWalters\Mf2;
 
@@ -115,5 +114,4 @@ class PostTypeDiscovery
     {
         return preg_replace('/\s+/', ' ', trim($value)) ?? '';
     }
-
 }

@@ -151,6 +151,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     /**
      * @param array<string, list<mixed>> $properties
+     *
      * @return list<array<string, mixed>>
      */
     private function checksForParsedEntry(
@@ -179,6 +180,7 @@ final class ValidateHEntryChecksTest extends TestCase
     /**
      * @param array<string, list<mixed>> $properties
      * @param list<string> $types
+     *
      * @return list<array<string, mixed>>
      */
     private function checksForEntry(
@@ -197,6 +199,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     /**
      * @param list<array<string, mixed>> $checks
+     *
      * @return array<string, mixed>
      */
     private function checkFor(array $checks, string $id): array
@@ -212,6 +215,7 @@ final class ValidateHEntryChecksTest extends TestCase
 
     /**
      * @param array<string, mixed> $check
+     *
      * @return array<string, mixed>
      */
     private function childFor(array $check, string $id): array

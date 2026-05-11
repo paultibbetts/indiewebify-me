@@ -42,6 +42,7 @@ final readonly class ValidateController
         if (!($url1 && $url2)) {
             $response_data['response'] = 'Please provide both url1 and url2 parameters';
             $response = $response->withStatus(400);
+
             return $this->responder->withJson($response, $response_data);
         }
 
@@ -56,6 +57,7 @@ final readonly class ValidateController
 
         if ($httpResponse['error']) {
             $response_data['response'] = 'Error: ' . $httpResponse['error'];
+
             return $this->responder->withJson($response, $response_data);
         }
 
@@ -75,6 +77,7 @@ final readonly class ValidateController
         }
 
         $response_data['response'] = 'Does not link back with rel=me';
+
         return $this->responder->withJson($response, $response_data);
     }
 
@@ -125,6 +128,7 @@ final readonly class ValidateController
                 $url,
                 array_pop($previous)
             );
+
             return $this->responder->withTemplate(
                 $response,
                 'validate-rel-me.twig',
@@ -135,6 +139,7 @@ final readonly class ValidateController
         $httpResponse = $this->client->get($url);
         if ($httpResponse['error']) {
             $error = $httpResponse['error'];
+
             return $this->responder->withTemplate(
                 $response,
                 'validate-rel-me.twig',
@@ -169,6 +174,7 @@ final readonly class ValidateController
 
         if ($input_url === '') {
             $error = 'Empty URLs lead nowhere!';
+
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-card.twig',

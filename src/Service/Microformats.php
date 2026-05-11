@@ -112,6 +112,7 @@ class Microformats
 
     /**
      * @param mixed $values
+     *
      * @return list<string>
      */
     private function normalizePlaintextValues(mixed $values): array
@@ -132,11 +133,11 @@ class Microformats
     }
 
     /**
-    *  @return array{
-    *       core: array<string, list<string>>,
-    *       additional: array<string, list<string>>
-    *   }
-    */
+     *  @return array{
+     *       core: array<string, list<string>>,
+     *       additional: array<string, list<string>>
+     *   }
+     */
     public function parseHCardProperties(array $h_card): array
     {
         # default each of the core properties to empty string
