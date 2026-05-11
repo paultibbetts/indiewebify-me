@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Service\Microformats;
+use App\Http\Client;
 use App\Service\RelMe;
 use App\Tests\WebTestCase;
 use IndieWeb;
@@ -83,14 +83,14 @@ final class RelMeTest extends WebTestCase
         $relMe = $this->getMockBuilder(RelMe::class)
             ->onlyMethods(['documentUrl', 'backlinkMatches'])
             ->getMock();
-        $microformats = $this->createMock(Microformats::class);
+        $client = $this->createMock(Client::class);
 
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($profile)
             ->willReturn([$profile, true, []]);
-        $microformats->expects(self::once())
-            ->method('httpGet')
+        $client->expects(self::once())
+            ->method('get')
             ->with($profile)
             ->willReturn([
                 'status' => 200,
@@ -104,7 +104,7 @@ final class RelMeTest extends WebTestCase
             ->willReturn([true, true, []]);
 
         $this->container()->set(RelMe::class, $relMe);
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $website,
@@ -127,14 +127,14 @@ final class RelMeTest extends WebTestCase
         $relMe = $this->getMockBuilder(RelMe::class)
             ->onlyMethods(['documentUrl'])
             ->getMock();
-        $microformats = $this->createMock(Microformats::class);
+        $client = $this->createMock(Client::class);
 
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($url)
             ->willReturn([$url, true, []]);
-        $microformats->expects(self::once())
-            ->method('httpGet')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
             ->willReturn([
                 'status' => 500,
@@ -144,7 +144,7 @@ final class RelMeTest extends WebTestCase
             ]);
 
         $this->container()->set(RelMe::class, $relMe);
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
@@ -162,14 +162,14 @@ final class RelMeTest extends WebTestCase
         $relMe = $this->getMockBuilder(RelMe::class)
             ->onlyMethods(['documentUrl'])
             ->getMock();
-        $microformats = $this->createMock(Microformats::class);
+        $client = $this->createMock(Client::class);
 
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($url)
             ->willReturn([$url, true, []]);
-        $microformats->expects(self::once())
-            ->method('httpGet')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
             ->willReturn([
                 'status' => 200,
@@ -179,7 +179,7 @@ final class RelMeTest extends WebTestCase
             ]);
 
         $this->container()->set(RelMe::class, $relMe);
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
@@ -199,14 +199,14 @@ final class RelMeTest extends WebTestCase
         $relMe = $this->getMockBuilder(RelMe::class)
             ->onlyMethods(['documentUrl', 'backlinkMatches'])
             ->getMock();
-        $microformats = $this->createMock(Microformats::class);
+        $client = $this->createMock(Client::class);
 
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($profile)
             ->willReturn([$profile, true, []]);
-        $microformats->expects(self::once())
-            ->method('httpGet')
+        $client->expects(self::once())
+            ->method('get')
             ->with($profile)
             ->willReturn([
                 'status' => 200,
@@ -216,7 +216,7 @@ final class RelMeTest extends WebTestCase
             ]);
 
         $this->container()->set(RelMe::class, $relMe);
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $website,
@@ -241,14 +241,14 @@ final class RelMeTest extends WebTestCase
         $relMe = $this->getMockBuilder(RelMe::class)
             ->onlyMethods(['documentUrl', 'backlinkMatches'])
             ->getMock();
-        $microformats = $this->createMock(Microformats::class);
+        $client = $this->createMock(Client::class);
 
         $relMe->expects(self::once())
             ->method('documentUrl')
             ->with($profile)
             ->willReturn([$profile, true, []]);
-        $microformats->expects(self::once())
-            ->method('httpGet')
+        $client->expects(self::once())
+            ->method('get')
             ->with($profile)
             ->willReturn([
                 'status' => 200,
@@ -262,7 +262,7 @@ final class RelMeTest extends WebTestCase
             ->willReturn([true, false, []]);
 
         $this->container()->set(RelMe::class, $relMe);
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/rel-me-check/?' . http_build_query([
             'url1' => $https,

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Service\MentionSender;
-use App\Service\ValidateHEntry;
+use App\Http\Client;
+use App\Service\WebmentionSender;
 use App\Tests\WebTestCase;
 
 final class SendWebmentionsTest extends WebTestCase
@@ -38,20 +38,21 @@ final class SendWebmentionsTest extends WebTestCase
     public function testSendWebmentionsFindsHEntries(): void
     {
         $url = 'https://example.com/post-with-no-h-entry-markup';
+        $html = '<html><body>No h-entry markup here.</body></html>';
 
-        $hEntryValidator = $this->createMock(ValidateHEntry::class);
+        $client = $this->createMock(Client::class);
 
-        $hEntryValidator->expects(self::once())
-            ->method('validate')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
             ->willReturn([
-                'url' => $url,
-                'found' => false,
-                'postType' => null,
-                'checks' => [],
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
             ]);
 
-        $this->container()->set(ValidateHEntry::class, $hEntryValidator);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->post('/send-webmentions/', [
             'url' => $url,
@@ -66,27 +67,37 @@ final class SendWebmentionsTest extends WebTestCase
     public function testSendWebmentionsSendsMentions(): void
     {
         $url = 'https://example.com/post';
+        $html = <<<HTML
+            <html>
+                <body>
+                    <article class="h-entry">
+                        <p class="e-content">This is a post.</p>
+                        <a class="u-url" href="{$url}">Permalink</a>
+                    </article>
+                </body>
+            </html>
+            HTML;
 
-        $hEntryValidator = $this->createMock(ValidateHEntry::class);
-        $mentionSender = $this->createMock(MentionSender::class);
+        $client = $this->createMock(Client::class);
+        $webmentionSender = $this->createMock(WebmentionSender::class);
 
-        $hEntryValidator->expects(self::once())
-            ->method('validate')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
             ->willReturn([
-                'url' => $url,
-                'found' => true,
-                'postType' => 'article',
-                'checks' => [],
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
             ]);
 
-        $mentionSender->expects(self::once())
+        $webmentionSender->expects(self::once())
             ->method('send')
             ->with($url)
             ->willReturn(2);
 
-        $this->container()->set(ValidateHEntry::class, $hEntryValidator);
-        $this->container()->set(MentionSender::class, $mentionSender);
+        $this->container()->set(Client::class, $client);
+        $this->container()->set(WebmentionSender::class, $webmentionSender);
 
         $response = $this->post('/send-webmentions/', [
             'url' => $url,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Http\Client;
 use App\Service\ValidateHEntry;
 use App\Tests\WebTestCase;
 
@@ -131,6 +132,7 @@ final class HEntryTest extends WebTestCase
     public function testHEntryPageShowsNoHEntryError(): void
     {
         $url = 'https://example.com/';
+        $html = '<html><head></head><body>No h-entry here.</body></html>';
 
         $report = [
             'url' => $url,
@@ -140,12 +142,24 @@ final class HEntryTest extends WebTestCase
         ];
 
         $validator = $this->createMock(ValidateHEntry::class);
+        $client = $this->createMock(Client::class);
+
+        $client->expects(self::once())
+            ->method('get')
+            ->with($url)
+            ->willReturn([
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
+            ]);
 
         $validator->expects(self::once())
             ->method('validate')
-            ->with($url)
+            ->with($url, [], $html)
             ->willReturn($report);
 
+        $this->container()->set(Client::class, $client);
         $this->container()->set(ValidateHEntry::class, $validator);
 
         $response = $this->get('/validate-h-entry/?' . http_build_query([
@@ -155,6 +169,6 @@ final class HEntryTest extends WebTestCase
         $payload = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('No h-entry was found on https://example.com/', $payload);
+        self::assertStringContainsString('No h-entry found', $payload);
     }
 }

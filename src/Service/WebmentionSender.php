@@ -6,7 +6,7 @@ namespace App\Service;
 
 use IndieWeb\MentionClient;
 
-class MentionSender
+class WebmentionSender
 {
     public function __construct(private readonly MentionClient $client)
     {

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Service\Microformats;
+use App\Http\Client;
 use App\Tests\WebTestCase;
-use RuntimeException;
 
 final class HCardTest extends WebTestCase
 {
@@ -58,32 +57,32 @@ final class HCardTest extends WebTestCase
         $url = 'https://example.com/';
         $photo = "{$url}photo.jpg";
         $note = 'A test h-card';
+        $html = <<<HTML
+            <html>
+                <body>
+                    <div class="h-card">
+                        <p class="p-name">{$name}</p>
+                        <a class="u-url u-uid" href="{$url}">{$url}</a>
+                        <img class="u-photo" src="{$photo}" alt="">
+                        <p class="p-note">{$note}</p>
+                    </div>
+                </body>
+            </html>
+            HTML;
 
-        $hCard = [
-            'type' => ['h-card'],
-            'properties' => [
-                'name' => [$name],
-                'url' => [$url],
-                'photo' => [$photo],
-                'note' => [$note],
-            ],
-        ];
+        $client = $this->createMock(Client::class);
 
-        $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHCards'])
-            ->getMock();
-
-        $microformats->expects(self::once())
-            ->method('findHCards')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
-            ->willReturn(
-                [
-                    'cards' => [$hCard],
-                    'representative' => $hCard,
-                ],
-            );
+            ->willReturn([
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
+            ]);
 
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->getFollowingRedirects('/validate-h-card/?' . http_build_query([
             'url' => $url,
@@ -101,22 +100,21 @@ final class HCardTest extends WebTestCase
     public function testHCardPageShowsNoHCardError(): void
     {
         $url = 'https://example.com/';
+        $html = '<html><head></head><body>No h-card here.</body></html>';
 
-        $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHCards'])
-            ->getMock();
+        $client = $this->createMock(Client::class);
 
-        $microformats->expects(self::once())
-            ->method('findHCards')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
-            ->willReturn(
-                [
-                    'cards' => [],
-                    'representative' => null,
-                ],
-            );
+            ->willReturn([
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
+            ]);
 
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => $url,
@@ -133,16 +131,19 @@ final class HCardTest extends WebTestCase
         $url = 'https://example.com/';
         $error = 'computer says no';
 
-        $microformats = $this->getMockBuilder(Microformats::class)
-          ->onlyMethods(['findHCards'])
-          ->getMock();
+        $client = $this->createMock(Client::class);
 
-        $microformats->expects(self::once())
-            ->method('findHCards')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
-            ->willThrowException(new RuntimeException($error));
+            ->willReturn([
+                'status' => null,
+                'body' => null,
+                'error' => $error,
+                'redirects' => null,
+            ]);
 
-        $this->container()->set(Microformats::class, $microformats);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/validate-h-card/?' . http_build_query([
             'url' => $url,

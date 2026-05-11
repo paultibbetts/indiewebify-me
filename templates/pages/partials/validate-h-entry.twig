@@ -61,4 +61,8 @@
     </div>
 {% endif %}
 
+{% if siteHints and (siteHints.silo or siteHints.software) %}
+	{% include 'pages/partials/sitehints.twig' with { siteHints: siteHints } only %}
+{% endif %}
+
 <small>Want to be able to use h-entry data in your code? Check out the open-source <a href="http://microformats.org/wiki/parsers">implementations</a>.</small>

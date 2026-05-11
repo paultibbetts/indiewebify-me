@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service;
+namespace App\Tests\Domain;
 
 use App\Domain\PostType;
-use App\Service\PostTypeDiscovery;
+use App\Domain\PostTypeDiscovery;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use Mf2;
 use PHPUnit\Framework\Attributes\DataProvider;

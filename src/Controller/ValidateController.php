@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use IndieWeb;
+use App\Domain\SiteHintsDetector;
+use App\Http\Client;
 use App\Responder\Responder;
 use App\Service\Microformats;
 use App\Service\RelMe;
@@ -14,11 +15,10 @@ use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface
 };
-use RuntimeException;
 
 final readonly class ValidateController
 {
-    public function __construct(private Responder $responder)
+    public function __construct(private Responder $responder, private Client $client)
     {
     }
 
@@ -28,7 +28,6 @@ final readonly class ValidateController
     public function rel_me_check(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService,
         RelMe $relMe
     ) {
         $response_data = [
@@ -52,7 +51,7 @@ final readonly class ValidateController
 
         [$inbound_url, $secure, $previous] = $relMe->documentUrl($url2);
 
-        $httpResponse = $mfService->httpGet($inbound_url);
+        $httpResponse = $this->client->get($inbound_url);
         $response_data['status'] = $httpResponse['status'];
 
         if ($httpResponse['error']) {
@@ -85,8 +84,8 @@ final readonly class ValidateController
     public function rel_me(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService,
-        RelMe $relMe
+        RelMe $relMe,
+        SiteHintsDetector $siteHints,
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
@@ -99,7 +98,7 @@ final readonly class ValidateController
 
         # validate rel-me for URL in query parameter
         $url = UrlNormalizer::normalize($input_url);
-        if (!$url) {
+        if ($url === '' || $url === '0') {
             return $this->responder->withTemplate(
                 $response,
                 'validate-rel-me.twig',
@@ -133,7 +132,7 @@ final readonly class ValidateController
             );
         }
 
-        $httpResponse = $mfService->httpGet($url);
+        $httpResponse = $this->client->get($url);
         if ($httpResponse['error']) {
             $error = $httpResponse['error'];
             return $this->responder->withTemplate(
@@ -144,11 +143,16 @@ final readonly class ValidateController
         }
 
         $rels = $relMe->links($httpResponse['body'], $url);
+        $hints = $siteHints->hintsFor($url, $httpResponse['body']);
 
         return $this->responder->withTemplate(
             $response,
             'validate-rel-me.twig',
-            ['url' => $url, 'rels' => $rels]
+            [
+                'siteHints' => $hints,
+                'rels' => $rels,
+                'url' => $url,
+            ]
         );
     }
 
@@ -158,7 +162,8 @@ final readonly class ValidateController
     public function h_card(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        Microformats $mfService
+        Microformats $mfService,
+        SiteHintsDetector $siteHints,
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
@@ -180,6 +185,7 @@ final readonly class ValidateController
             );
 
         }
+
         # validate h-card for URL in query parameter
         $url = UrlNormalizer::normalize($input_url);
 
@@ -193,19 +199,22 @@ final readonly class ValidateController
             );
         }
 
-        ## parse h-cards
-
-        try {
-            $cards_response = $mfService->findHCards($url);
-        } catch (RuntimeException $e) {
+        $httpResponse = $this->client->get($url);
+        if ($httpResponse['error']) {
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-card.twig',
                 [
-                    'error' => $e->getMessage(),
+                    'error' => $httpResponse['error'],
                 ]
             );
         }
+
+        $html = $httpResponse['body'];
+
+        ## parse h-cards
+        $microformats = $mfService->parse($html, $url);
+        $cards_response = $mfService->findHCards($microformats, $url);
 
         if (!$cards_response['cards'] && !$cards_response['representative']) {
             return $this->responder->withTemplate(
@@ -234,6 +243,8 @@ final readonly class ValidateController
 
         $properties = $mfService->parseHCardProperties($card);
 
+        $hints = $siteHints->hintsFor($url, $html);
+
         return $this->responder->withTemplate(
             $response,
             'validate-h-card.twig',
@@ -244,6 +255,7 @@ final readonly class ValidateController
                 'additional' => $properties['additional'],
                 'cards' => $cards_response['cards'],
                 'representative' => $cards_response['representative'],
+                'siteHints' => $hints,
             ]
         );
     }
@@ -254,7 +266,9 @@ final readonly class ValidateController
     public function h_entry(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        ValidateHEntry $validator
+        ValidateHEntry $validator,
+        SiteHintsDetector $siteHints,
+        Microformats $microformats,
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
@@ -288,25 +302,34 @@ final readonly class ValidateController
             );
         }
 
-        try {
-            $report = $validator->validate($url);
-        } catch (RuntimeException $e) {
+        $httpResponse = $this->client->get($url);
+
+        if ($httpResponse['error']) {
             return $this->responder->withTemplate(
                 $response,
                 'validate-h-entry.twig',
                 [
                     'url' => $url,
-                    'error' => $e->getMessage(),
+                    'error' => $httpResponse['error'],
                 ]
             );
         }
+
+        $html = $httpResponse['body'];
+
+        $mf = $microformats->parse($html, $url);
+        $entries = $microformats->findHEntries($mf);
+
+        $report = $validator->validate($url, $entries, $html);
+        $hints = $siteHints->hintsFor($url, $html);
 
         return $this->responder->withTemplate(
             $response,
             'validate-h-entry.twig',
             [
-                'url' => $url,
                 'report' => $report,
+                'siteHints' => $hints,
+                'url' => $url,
             ]
         );
     }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Service\Microformats;
-use App\Service\PostTypeDiscovery;
+use App\Domain\PostTypeDiscovery;
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
 
@@ -109,8 +108,8 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testReplyIntentDetectedButNoParsedUrl(): void
     {
-        $check = $this->checkFor($this->checksForParsedEntry(
-            rawHtml: '<article class="h-entry"><span class="u-in-reply-to">https://example.net/post</span></article>',
+        $check = $this->checkFor($this->checksForHtmlEvidence(
+            '<article class="h-entry"><span class="u-in-reply-to">https://example.net/post</span></article>',
         ), 'in-reply-to');
 
         self::assertSame('warning', $check['status']);
@@ -141,8 +140,8 @@ final class ValidateHEntryChecksTest extends TestCase
 
     public function testRsvpIntentDetectedButNoParsedValue(): void
     {
-        $check = $this->checkFor($this->checksForParsedEntry(
-            rawHtml: '<article class="h-entry"><span class="p-rsvp"></span></article>',
+        $check = $this->checkFor($this->checksForHtmlEvidence(
+            '<article class="h-entry"><span class="p-rsvp"></span></article>',
         ), 'rsvp');
 
         self::assertSame('warning', $check['status']);
@@ -155,27 +154,44 @@ final class ValidateHEntryChecksTest extends TestCase
      */
     private function checksForParsedEntry(
         array $properties = [],
-        string $rawHtml = '<article class="h-entry"></article>',
         array $types = ['h-entry'],
     ): array {
-        $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHEntriesWithHtml'])
-            ->getMock();
-        $validator = new ValidateHEntry($microformats, new PostTypeDiscovery());
+        return $this->checksForEntry(
+            properties: $properties,
+            rawHtml: '<article class="h-entry"></article>',
+            types: $types,
+        );
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function checksForHtmlEvidence(string $rawHtml): array
+    {
+        return $this->checksForEntry(
+            properties: [],
+            rawHtml: $rawHtml,
+            types: ['h-entry'],
+        );
+    }
+
+    /**
+     * @param array<string, list<mixed>> $properties
+     * @param list<string> $types
+     * @return list<array<string, mixed>>
+     */
+    private function checksForEntry(
+        array $properties,
+        string $rawHtml,
+        array $types,
+    ): array {
+        $validator = new ValidateHEntry(new PostTypeDiscovery());
         $entry = [
             'type' => $types,
             'properties' => $properties,
         ];
 
-        $microformats->expects(self::once())
-            ->method('findHEntriesWithHtml')
-            ->with('https://example.com/post')
-            ->willReturn([
-                'entries' => [$entry],
-                'html' => $rawHtml,
-            ]);
-
-        return $validator->validate('https://example.com/post')['checks'];
+        return $validator->validate('https://example.com/post', [$entry], $rawHtml)['checks'];
     }
 
     /**

@@ -4,33 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Service\Microformats;
-use App\Service\PostTypeDiscovery;
+use App\Domain\PostTypeDiscovery;
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
-use Slim\App;
 
 final class ValidateHEntryTest extends TestCase
 {
-    protected App $app;
-
-    /**
-    * Runs before every test.
-    *
-    * Sets $app to a fresh instance of the application.
-    */
-    protected function setUp(): void
-    {
-        $this->app = require dirname(__DIR__, 2) . '/config/bootstrap.php';
-    }
-
     public function testValidates(): void
     {
-        $microformats = $this->getMockBuilder(Microformats::class)
-            ->onlyMethods(['findHEntriesWithHtml'])
-            ->getMock();
         $ptd = new PostTypeDiscovery();
-        $validator = new ValidateHEntry($microformats, $ptd);
+        $validator = new ValidateHEntry($ptd);
 
         $url = 'https://example.com/';
         $post = "{$url}post";
@@ -65,16 +48,9 @@ final class ValidateHEntryTest extends TestCase
                 ],
             ],
         ];
+        $html = '<article class="h-entry">not used in this test</article>';
 
-        $microformats->expects(self::once())
-            ->method('findHEntriesWithHtml')
-            ->with($url)
-            ->willReturn([
-                'entries' => $mf2,
-                'html' => '<article class="h-entry">not used in this test</article>',
-            ]);
-
-        $report = $validator->validate($url);
+        $report = $validator->validate($url, $mf2, $html);
 
         self::assertTrue($report['found']);
         self::assertSame($url, $report['url']);

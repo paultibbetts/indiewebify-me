@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Http\Client;
 use App\Responder\Responder;
-use App\Service\MentionSender;
+use App\Service\WebmentionSender;
+use App\Service\Microformats;
 use App\Service\ValidateHEntry;
 use App\Support\UrlNormalizer;
 use Psr\Http\Message\{
@@ -37,8 +39,10 @@ final readonly class WebmentionController
     public function send(
         ServerRequestInterface $request,
         ResponseInterface $response,
+        Client $client,
+        Microformats $microformats,
         ValidateHEntry $hEntryValidator,
-        MentionSender $mentionSender,
+        WebmentionSender $webmentionSender,
     ) {
         $body = $request->getParsedBody();
         $url = $body['url'] ?? null;
@@ -54,7 +58,24 @@ final readonly class WebmentionController
             );
         }
 
-        $validation = $hEntryValidator->validate($url);
+        $url = UrlNormalizer::normalize($url);
+        $httpResponse = $client->get($url);
+        if ($httpResponse['error']) {
+            return $this->responder->withTemplate(
+                $response,
+                'send-webmentions.twig',
+                [
+                    'url' => $url,
+                    'error' => $httpResponse['error'],
+                ]
+            );
+        }
+
+        $html = $httpResponse['body'];
+        $mf = $microformats->parse($html, $url);
+        $entries = $microformats->findHEntries($mf);
+
+        $validation = $hEntryValidator->validate($url, $entries, $html);
         if (!$validation['found']) {
             return $this->responder->withTemplate(
                 $response,
@@ -66,9 +87,7 @@ final readonly class WebmentionController
             );
         }
 
-        $numSent = $mentionSender->send(
-            UrlNormalizer::normalize($url)
-        );
+        $numSent = $webmentionSender->send($url);
 
         return $this->responder->withTemplate(
             $response,

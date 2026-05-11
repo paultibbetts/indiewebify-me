@@ -152,7 +152,7 @@
 			<b class="d-block">{{ label }}</b>
 			<ul>
 				{%~ for value in item ~%}
-				<li> {{ value }} </li>
+					<li> {{ value }} </li>
 				{%~ endfor ~%}
 			</ul>
 		</div>
@@ -162,6 +162,10 @@
 	{% endif %}
 
 </div>
+{% endif %}
+
+{% if siteHints and (siteHints.silo or siteHints.software) %}
+	{% include 'pages/partials/sitehints.twig' with { siteHints: siteHints } only %}
 {% endif %}
 
 <small>Want to be able to use h-card data in your code? Check out the open-source <a href="https://microformats.org/wiki/parsers">implementations</a>.</small>

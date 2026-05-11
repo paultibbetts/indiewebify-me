@@ -8,18 +8,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use DateTime;
-use Exception;
 use BarnabyWalters\Mf2 as Mf2Helper;
-use GuzzleHttp\{
-    Client,
-    Exception\RequestException,
-    Exception\TransferException,
-    RequestOptions
-};
 use Mf2;
-use RuntimeException;
-use Throwable;
 
 class Microformats
 {
@@ -90,112 +80,26 @@ class Microformats
         'categories',
     ];
 
-    public function httpGet(string $url): array
+    public function parse(string $html, string $url): array
     {
-        $response = null;
-
-        $output = array_fill_keys([
-            'status',
-            'body',
-            'error',
-            'redirects',
-        ], null);
-
-        try {
-            $client = new Client([
-                RequestOptions::ALLOW_REDIRECTS => [
-                    'track_redirects' => true,
-                ],
-            ]);
-
-            $response = $client->get($url);
-        } catch (RequestException $e) {
-            $output['error'] = $e->getMessage();
-
-            if ($e->hasResponse()) {
-                $response = $e->getResponse();
-                $output['error'] = sprintf(
-                    'The site %s returned %d %s when we tried to fetch it.',
-                    $url,
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase(),
-                );
-            } else {
-                $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
-            }
-        } catch (TransferException) {
-            $output['error'] = "We could not fetch {$url}. Check that the site is reachable and try again.";
-        }
-
-        if ($response instanceof \Psr\Http\Message\ResponseInterface) {
-            $output['status'] = $response->getStatusCode();
-            $output['body'] = (string) $response->getBody();
-
-            # track redirect history
-            # See https://docs.guzzlephp.org/en/stable/faq.html?highlight=redirects#how-can-i-track-redirected-requests
-
-            // Retrieve both Redirect History headers
-            $redirectHistory = $response->getHeader('X-Guzzle-Redirect-History');
-            $redirectStatus = $response->getHeader('X-Guzzle-Redirect-Status-History');
-
-            // Add the initial URI requested to the (beginning of) URI history
-            array_unshift($redirectHistory, $url);
-
-            // Add the final HTTP status code to the end of HTTP response history
-            $redirectStatus[] = $response->getStatusCode();
-
-            $redirects = [];
-            foreach ($redirectHistory as $key => $value) {
-                $redirects[$key] = [
-                    'location' => $value,
-                    'status' => $redirectStatus[$key],
-                ];
-            }
-
-            $output['redirects'] = $redirects;
-        }
-
-        return $output;
-    }
-
-    public function fetch(string $url): array
-    {
-        return $this->fetchWithHtml($url)['microformats'];
+        return Mf2\parse($html, $url, convertClassic: true);
     }
 
     /**
-     * @return array{microformats: array<string, mixed>, html: string}
-     */
-    public function fetchWithHtml(string $url): array
-    {
-        $response = $this->httpGet($url);
-
-        if ($response['error']) {
-            throw new RuntimeException($response['error']);
-        }
-
-        try {
-            $html = (string) $response['body'];
-
-            return [
-                'microformats' => Mf2\parse($html, $url, convertClassic: true),
-                'html' => $html,
-            ];
-        } catch (Throwable $e) {
-            throw new RuntimeException('Could not parse page.', $e->getCode(), previous: $e);
-        }
-    }
-
-    /**
-     * Fetch a URL and parse for h-card
-     * Return an array with index `represntative` that has
+     * Finds h-cards.
+     *
+     * Returns an array with index `representative` that has
      * the representative h-card, or null if none found; as
      * well as index `cards` which is an array of all h-cards
      * found on the page
+     *
+     * @return array{
+     *  cards: list<array<string, mixed>>,
+     *  representative: array<string, mixed>|null
+     *  }
      */
-    public function findHCards(string $url): array
+    public function findHCards(array $microformats, string $url): array
     {
-        $microformats = $this->fetch($url);
         $cards = Mf2Helper\findMicroformatsByType($microformats, 'h-card');
         $representative = Mf2Helper\getRepresentativeHCard($microformats, $url);
 
@@ -203,26 +107,19 @@ class Microformats
     }
 
     /**
-     * Fetch a URL and parse for h-entry
+     * Find the h-entries in the provided microformats
      */
-    public function findHEntries(string $url): array
+    public function findHEntries(array $microformats): array
     {
-        return $this->findHEntriesWithHtml($url)['entries'];
+        return Mf2Helper\findMicroformatsByType($microformats, 'h-entry');
     }
 
     /**
-     * @return array{entries: list<array<string, mixed>>, html: string}
-     */
-    public function findHEntriesWithHtml(string $url): array
-    {
-        $result = $this->fetchWithHtml($url);
-
-        return [
-            'entries' => Mf2Helper\findMicroformatsByType($result['microformats'], 'h-entry'),
-            'html' => $result['html'],
-        ];
-    }
-
+    *  @return array{
+    *       core: array<string, list<string>>,
+    *       additional: array<string, list<string>>
+    *   }
+    */
     public function parseHCardProperties(array $h_card): array
     {
         # default each of the core properties to empty string
@@ -243,102 +140,5 @@ class Microformats
         $additional = array_filter($additional);
 
         return ['core' => $core, 'additional' => $additional];
-    }
-
-    public function parseHEntryProperties(array $h_entry): array
-    {
-        $core = array_fill_keys($this->core_entry_properties, '');
-
-        $core['name'] = Mf2Helper\getPlaintext($h_entry, 'name');
-
-        if (Mf2Helper\hasProp($h_entry, 'content')) {
-            $core['content'] = Mf2Helper\getPlaintext($h_entry, 'content');
-            $core['is_content_html'] = Mf2Helper\isEmbeddedHtml(
-                $h_entry['properties']['content'][0]
-            );
-        }
-
-        $name_state = null;
-        if ($core['content'] && $core['name']) {
-            $name_state = mb_strlen((string) $core['name']) > mb_strlen((string) $core['content'])
-                ? 'invalid'
-                : 'valid';
-        }
-
-        $core['name_state'] = $name_state;
-
-        $core['author'] = $this->parseAuthor($h_entry);
-
-        if (Mf2Helper\hasProp($h_entry, 'published')) {
-            $core['published'] = Mf2Helper\getPlaintext($h_entry, 'published');
-            $core['is_published_valid'] = $this->isDateTimeValid($core['published']);
-        }
-
-        $core['url'] = Mf2Helper\getPlaintext($h_entry, 'url');
-        $core['categories'] = Mf2Helper\getPlaintextArray($h_entry, 'category');
-        $core['syndications'] = Mf2Helper\getPlaintextArray($h_entry, 'syndication');
-
-        if (Mf2Helper\hasProp($h_entry, 'in-reply-to')) {
-            $core['in_reply_to'] = $this->parseInReplyTo($h_entry);
-        }
-
-        return $core;
-    }
-
-    public function isDateTimeValid(string $date): bool
-    {
-        try {
-            $dt = new DateTime($date);
-            return true;
-        } catch (Exception) {
-            return false;
-        }
-    }
-
-    public function parseAuthor(array $h_entry): ?array
-    {
-        if (!Mf2Helper\hasProp($h_entry, 'author')) {
-            return null;
-        }
-
-        $author = Mf2Helper\getAuthor($h_entry);
-        $is_h_card = false;
-
-        if (Mf2Helper\isMicroformat($author)) {
-            $is_h_card = true;
-            $name = Mf2Helper\getPlaintext($author, 'name');
-            $photo = Mf2Helper\getPlaintext($author, 'photo');
-            $url = Mf2Helper\getPlaintext($author, 'url');
-
-            return ['name' => $name, 'photo' => $photo, 'url' => $url, 'is_h_card' => $is_h_card];
-        } elseif (is_string($author)) {
-            $name = $author;
-            return ['name' => $name, 'is_h_card' => $is_h_card];
-        }
-
-        return null;
-    }
-
-    public function parseInReplyTo(array $h_entry): ?array
-    {
-        if (!Mf2Helper\hasProp($h_entry, 'in-reply-to')) {
-            return null;
-        }
-
-        $response = [];
-        foreach ($h_entry['properties']['in-reply-to'] as $item) {
-            $is_microformat = $is_h_cite = false;
-            if (Mf2Helper\isMicroformat($item)) {
-                $is_h_cite = in_array('h-cite', $item['type']);
-                $is_microformat = true;
-                $url = Mf2Helper\getPlaintext($item, 'url');
-            } else {
-                $url = $item;
-            }
-
-            $response[] = ['url' => $url, 'is_microformat' => $is_microformat, 'is_h_cite' => $is_h_cite];
-        }
-
-        return $response;
     }
 }

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Domain\PostTypeDiscovery;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use DateTimeImmutable;
 use Exception;
@@ -20,7 +21,6 @@ class ValidateHEntry
     private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
 
     public function __construct(
-        private readonly Microformats $microformats,
         private readonly PostTypeDiscovery $ptd,
     ) {
     }
@@ -28,11 +28,9 @@ class ValidateHEntry
     /**
      * @return array{url: string, found: bool, postType: string|null, checks: list<array<string, mixed>>}
      */
-    public function validate(string $url): array
+    public function validate(string $url, array $entries, string $html): array
     {
-        $result = $this->microformats->findHEntriesWithHtml($url);
-
-        if ($result['entries'] === []) {
+        if ($entries === []) {
             return [
                 'url' => $url,
                 'found' => false,
@@ -41,7 +39,7 @@ class ValidateHEntry
             ];
         }
 
-        $entry = $result['entries'][0];
+        $entry = $entries[0];
 
         $checks = [
             $this->checkName($entry),
@@ -56,17 +54,17 @@ class ValidateHEntry
         ];
 
         foreach ($interactionChecks as $check) {
-            if ($this->hasInteractionEvidence($entry, $result['html'], $check['class'])) {
+            if ($this->hasInteractionEvidence($entry, $html, $check['class'])) {
                 $checks[] = $this->checkInteractionTarget(
                     $entry,
-                    $result['html'],
+                    $html,
                     $check['class'],
                     $check['label'],
                 );
             }
         }
 
-        if ($this->hasRsvpEvidence($entry, $result['html'])) {
+        if ($this->hasRsvpEvidence($entry, $html)) {
             $checks[] = $this->checkRSVP($entry);
         }
 

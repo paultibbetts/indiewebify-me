@@ -53,4 +53,8 @@
 	</div>
 </form>
 
+{% if siteHints and (siteHints.silo or siteHints.software) %}
+	{% include 'pages/partials/sitehints.twig' with { siteHints: siteHints } only %}
+{% endif %}
+
 <small>Want to be able to use rel-me data in your code? Check out the open source <a href="https://indieweb.org/rel-me#Implementations">implementations</a>.</small>
