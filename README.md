@@ -165,6 +165,19 @@ I am leaving the content as it is, but leaving this here to remind me.
 
 I want to maintain features from the silex version for backwards compatability/bookmarked URLs, but I'm not sure about these two endpoints.
 
+### should the webmention sender block if no h-entry found?
+
+The old version sent webmentions and then warned that no h-entry was found on the page. I have changed it to require a valid h-entry before sending webmentions.
+
+pros:
+- this step comes after "have a valid h-entry" step, and as part of the validator it makes more sense (to me) to require the previous step to be complete
+- looking at the issues on indiewebify-me there is discussion about sending users to other webmention sending services anyway
+
+cons:
+- this change does not preserve the behaviour of the old app
+- users might want to use this to send webmentions even if they do not implement h-entry
+- - but that does not fit into the intent of indiewebify-me?
+
 ## Credits
 
 Originally made by Brennan Novak, Barnaby Walters, and others at the 2013 IndieWebCamps in [Reykjavik](http://indieweb.org/2013/#Remote_Indiewebcamp_Parties) and [Brighton](http://indieweb.org/2013/UK).
