@@ -178,6 +178,12 @@ cons:
 - users might want to use this to send webmentions even if they do not implement h-entry
 - - but that does not fit into the intent of indiewebify-me?
 
+## Migration Observations
+
+### hugo does not inject the generator on pages that aren't the homepage
+
+Which means the h-entry site hint check for hugo (and possibly others) doesn't do anything.
+
 ## Credits
 
 Originally made by Brennan Novak, Barnaby Walters, and others at the 2013 IndieWebCamps in [Reykjavik](http://indieweb.org/2013/#Remote_Indiewebcamp_Parties) and [Brighton](http://indieweb.org/2013/UK).
