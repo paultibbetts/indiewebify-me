@@ -144,7 +144,7 @@ class ValidateHEntry
                 'author.string',
                 $this->textValue($authorName),
                 [
-                    'html' => 'You’re marking up your post’s author as a string — add <code>h-card</code> to make it a full h-card!',
+                    'html' => "You’re marking up your post's author as a string — add <code>h-card</code> to make it a full h-card!",
                     'example' => sprintf('<a class="p-author h-card" href="…">%s</a>', $authorName),
                 ],
                 [
@@ -465,7 +465,7 @@ class ValidateHEntry
                     self::WARNING,
                     'interaction.intent-detected-but-no-parsed-value',
                     help: [
-                        'html' => 'The HTML suggests this interaction target, but no value was parsed. Check that the class is on a URL-bearing element.',
+                        'html' => "The HTML suggests this is a {$label}, but no value was parsed. Check that the class is on a URL-bearing element.",
                     ],
                 );
             }
