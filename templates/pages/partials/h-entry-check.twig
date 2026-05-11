@@ -12,13 +12,7 @@
 		<b>{{ check.label }}</b>
 		{% if check.status != 'found' and check.id != 'name' %}
 			<span class="badge {{ statusClass }}">
-				{{
-					check.status
-						|replace({
-							'_': ' '
-						})
-						|title
-				}}
+				{{ check.status|replace({'_': ' '})|title }}
 			</span>
 		{% endif %}
 	</div>

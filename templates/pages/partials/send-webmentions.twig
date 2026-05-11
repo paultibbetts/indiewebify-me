@@ -16,11 +16,12 @@
 	<li>using the form below</li>
 	<li>using <a href="https://telegraph.p3k.io/">Telegraph</a>, which lets you choose which links to send to</li>
 	<li>
-		from the command line <a href="https://indieweb.org/webmention-implementation-guide">using Curl</a> or <a href="https://github.com/vrypan/webmention-tools">webmention-tools</a>
+		from the command line <a href="https://indieweb.org/webmention-implementation-guide">using Curl</a> or
+		<a href="https://github.com/vrypan/webmention-tools">webmention-tools</a>
 	</li>
 	<li>
-		Make your publishing software send webmentions for you automatically using one of the <a href="https://indieweb.org/Webmention-developer#Libraries">open
-			source libraries</a>
+		Make your publishing software send webmentions for you automatically using one of the
+		<a href="https://indieweb.org/Webmention-developer#Libraries">open source libraries</a>
 	</li>
 	<li>
 		Or, get down and dirty with the <a href="http://webmention.net">Webmention spec</a> and implement it yourself
@@ -49,19 +50,9 @@
 			</p>
 			<p>
 				When you send webmentions from a page, the pages you’ve mentioned will usually fetch it and parse it for
-				h-entry markup, to display as comments or notifications. You should <a
-					href="{{
-					url_for(
-						'validate_h_entry',
-						{},
-						{
-							url: url
-						}
-					)
-					}}"
-				>
-					mark up your posts with h-entry
-				</a> so the people you mention can do something useful with the information.
+				h-entry markup, to display as comments or notifications. You should
+				<a href="{{url_for('validate_h_entry', {}, { url: url }) }}">mark up your posts with h-entry</a>
+				so the people you mention can do something useful with the information.
 			</p>
 		{% else %}
 			<p>
