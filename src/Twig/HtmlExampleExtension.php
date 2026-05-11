@@ -9,10 +9,11 @@ use Twig\TwigFilter;
 
 final class HtmlExampleExtension extends AbstractExtension
 {
+    #[\Override]
     public function getFilters(): array
     {
         return [
-            new TwigFilter('html_example', [$this, 'highlight'], ['is_safe' => ['html']]),
+            new TwigFilter('html_example', $this->highlight(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -29,7 +30,7 @@ final class HtmlExampleExtension extends AbstractExtension
         $escaped = preg_replace(
             '/\s([a-z:-]+)=(&quot;.*?&quot;)/i',
             ' <span class="token-attr">$1</span>=<span class="token-string">$2</span>',
-            $escaped
+            (string) $escaped
         );
 
         return $escaped ?? htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
