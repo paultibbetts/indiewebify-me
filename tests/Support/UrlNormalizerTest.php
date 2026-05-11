@@ -16,4 +16,12 @@ final class UrlNormalizerTest extends TestCase
 
         self::assertSame('http://example.com/', $normalized);
     }
+
+    public function testFixesSpacesBeforeUrl(): void
+    {
+        $withSpaces = ' http://example.com';
+        $normalized = UrlNormalizer::normalize($withSpaces);
+
+        self::assertSame('http://example.com/', $normalized);
+    }
 }

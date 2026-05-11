@@ -10,6 +10,8 @@ final class UrlNormalizer
 {
     public static function normalize(string $url): string
     {
+        $url = trim($url);
+
         $hasScheme = preg_match('#^https?://#i', $url) === 1;
 
         if (!$hasScheme) {
