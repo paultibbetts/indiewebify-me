@@ -132,8 +132,8 @@ class Microformats
             $core[$name] = Mf2Helper\getPlaintextArray($h_card, $name);
         }
 
-        foreach ($this->additional_card_properties as $name) {
-            $additional[$name] = Mf2Helper\getPlaintextArray($h_card, $name);
+        foreach ($this->additional_card_properties as $key => $name) {
+            $additional[$name] = Mf2Helper\getPlaintextArray($h_card, $key);
         }
 
         $core = array_filter($core);
