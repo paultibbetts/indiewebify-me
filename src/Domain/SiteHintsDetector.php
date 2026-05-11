@@ -49,6 +49,9 @@ final class SiteHintsDetector
         }
 
         $generators = [
+            'astro',
+            'eleventy',
+            'ghost',
             'hugo',
             'idno',
             'known',

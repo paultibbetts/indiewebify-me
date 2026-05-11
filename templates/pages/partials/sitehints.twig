@@ -17,6 +17,18 @@
 		<p>It looks like your site is hosted on <a href="https://indieweb.org/Github">GitHub.io Silo</a> without a custom domain name. In order to really own your content you need to own your URLs, but don’t worry — Github has <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-pages">an article</a> demonstrating how to give your web presence your own domain.</p>
 		<p>Once you’ve got your own domain, check out the IndieWeb <a href="https://indieweb.org/Github">Github wiki page</a> for tips on adding indieweb functionality to your site.</p>
 	</div>
+{% elseif siteHints.software == 'astro' %}
+	<div class="alert alert-info">
+		It looks like you’re using Astro to power your site — check out the IndieWeb <a href="https://indieweb.org/Astro">Astro wiki page</a> for tips on how to indiewebify your Astro site!
+	</div>
+{% elseif siteHints.software == 'eleventy' %}
+	<div class="alert alert-info">
+		It looks like you’re using Eleventy to power your site — check out the IndieWeb <a href="https://indieweb.org/Eleventy">Eleventy wiki page</a> for tips on how to indiewebify your Eleventy site!
+	</div>
+{% elseif siteHints.software == 'ghost' %}
+	<div class="alert alert-info">
+		It looks like you’re using Ghost to power your site — check out the IndieWeb <a href="https://indieweb.org/Ghost">Ghost wiki page</a> for tips on how to indiewebify your Ghost site!
+	</div>
 {% elseif siteHints.software == 'hugo' %}
 	<div class="alert alert-info">
 		It looks like you’re using Hugo to power your site — check out the IndieWeb <a href="https://indieweb.org/Hugo">Hugo wiki page</a> for tips on how to indiewebify your Hugo site!
