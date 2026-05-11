@@ -161,6 +161,10 @@ The [wiki](https://indieweb.org/h-card#How_to_markup) does not include `u-url`?
 
 I am leaving the content as it is, but leaving this here to remind me.
 
+### does this need /rel-me-links and /rel-me-links-info ?
+
+I want to maintain features from the silex version for backwards compatability/bookmarked URLs, but I'm not sure about these two endpoints.
+
 ## Credits
 
 Originally made by Brennan Novak, Barnaby Walters, and others at the 2013 IndieWebCamps in [Reykjavik](http://indieweb.org/2013/#Remote_Indiewebcamp_Parties) and [Brighton](http://indieweb.org/2013/UK).
