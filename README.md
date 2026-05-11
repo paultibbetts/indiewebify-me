@@ -93,8 +93,8 @@ My aims are:
 - update to the latest version of PHP
 - make it easier for new contributors to get this up and running on their machine
 - create a test suite
-- - to verify this migration is feature-complete
-- - to provide guardrails for new contributors
+-   - to verify this migration is feature-complete
+-   - to provide guardrails for new contributors
 - maintain frontend styling so it doesn't look any different to before
 - make indiewebify-me a good target for a future [IndieWeb Hackathon](https://indieweb.org/IndieWeb_Hackathon#Requested_Projects)
 
@@ -104,34 +104,34 @@ I am not aiming to add new features or fix any of the (currently) 50 issues open
 
 - add composer.json
 - update to PHP 8.5
-- - repo currently includes patches for dependencies not updated yet
-- - I will submit these patches as PRs closer to completion
+-   - repo currently includes patches for dependencies not updated yet
+-   - I will submit these patches as PRs closer to completion
 - add tooling to aid migration
-- - see scripts in composer.json
+-   - see scripts in composer.json
 - add a docker compose setup for local development
-- - this is really simple right now
-- - and is not intended for production
+-   - this is really simple right now
+-   - and is not intended for production
 - port Flat UI to a Bootstrap 5 theme
-- - not perfect, but (mostly) maintains previous style
-- - changing the frontend is not a goal of this migration
-- - - but facilitating a potential future change is
+-   - not perfect, but (mostly) maintains previous style
+-   - changing the frontend is not a goal of this migration
+-   -   - but facilitating a potential future change is
 - add the index page back
 - ported /send-webmentions from the old version
 - add the "pagination" back
-- - accidentally fixed level 3 not being included in the pagination
+-   - accidentally fixed level 3 not being included in the pagination
 - started a test suite
-- - /validate-rel-me
-- - /send-webmentions
+-   - /validate-rel-me
+-   - /send-webmentions
 - fixed a few minor errors with the original version
-- - typos and whitespace
-- - removed mention of `rel="in-reply-to"` (#97)
+-   - typos and whitespace
+-   - removed mention of `rel="in-reply-to"` (#97)
 
 See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration...paultibbetts:indiewebify-me:slim-migration) for all changes.
 
 #### Planned
 
 - [x] finish validate-h-entry
-- - with minimal post type discovery
+-   - with minimal post type discovery
 - [x] tests for validate-h-card
 - [x] tests for validate-h-entry
 - [x] tests for index page
@@ -148,9 +148,11 @@ See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration..
 Should default scheme be `https` now?
 
 pros:
+
 - https is the new standard (?)
 
 cons:
+
 - http -> https redirect should be working on all sites
 
 ### what is a minimal h-card?
@@ -170,13 +172,15 @@ I want to maintain features from the silex version for backwards compatability/b
 The old version sent webmentions and then warned that no h-entry was found on the page. I have changed it to require a valid h-entry before sending webmentions.
 
 pros:
+
 - this step comes after "have a valid h-entry" step, and as part of the validator it makes more sense (to me) to require the previous step to be complete
 - looking at the issues on indiewebify-me there is discussion about sending users to other webmention sending services anyway
 
 cons:
+
 - this change does not preserve the behaviour of the old app
 - users might want to use this to send webmentions even if they do not implement h-entry
-- - but that does not fit into the intent of indiewebify-me?
+-   - but that does not fit into the intent of indiewebify-me?
 
 ## Migration Observations
 

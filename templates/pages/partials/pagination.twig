@@ -1,10 +1,11 @@
-<hr/>
+<hr />
 <p>
 	{% if previous %}
-	<a href="{{ url_for(previous) }}">Previous Step</a> |
+		<a href="{{ url_for(previous) }}">Previous Step</a> |
 	{% endif %}
 	<a href="/">Home</a>
-	{% if next %}|
-	<a href="{{ url_for(next) }}">Next Step</a>
+	{% if next %}
+		|
+		<a href="{{ url_for(next) }}">Next Step</a>
 	{% endif %}
 </p>

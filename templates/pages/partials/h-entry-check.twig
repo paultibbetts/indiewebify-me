@@ -1,88 +1,114 @@
-{% set statusClass = {
-    found: 'text-bg-success',
-    warning: 'text-bg-warning',
-    fail: 'text-bg-danger',
-    info: 'text-bg-info'
-}[check.status]|default('text-bg-secondary') %}
+{% set statusClass =
+	{
+		found: 'text-bg-success',
+		warning: 'text-bg-warning',
+		fail: 'text-bg-danger',
+		info: 'text-bg-info'
+	}[check.status]|default('text-bg-secondary')
+%}
 
-<div class="{{check.id == 'content' ? 'e-content' : ''}} my-3">
-    <div class="d-flex align-items-center gap-2 mb-1">
-        <b>{{ check.label }}</b>
+<div class="{{ check.id == 'content' ? 'e-content' : '' }} my-3">
+	<div class="d-flex align-items-center gap-2 mb-1">
+		<b>{{ check.label }}</b>
 		{% if check.status != 'found' and check.id != 'name' %}
-			<span class="badge {{ statusClass }}">{{ check.status|replace({'_': ' '})|title }}</span>
+			<span class="badge {{ statusClass }}">
+				{{
+					check.status
+						|replace({
+							'_': ' '
+						})
+						|title
+				}}
+			</span>
 		{% endif %}
-    </div>
+	</div>
 
-    {% if check.value %}
-        {% set value = check.value %}
+	{% if check.value %}
+		{% set value = check.value %}
 
-        {% if value.type == 'text' %}
-            <div>{{ value.text }}</div>
-        {% elseif value.type == 'url' %}
-            <div><a href="{{ value.url }}">{{ value.url }}</a></div>
-        {% elseif value.type == 'url-list' %}
-            <ul class="mb-0">
-                {% for url in value.urls %}
-                    <li><a href="{{ url }}">{{ url }}</a></li>
-                {% endfor %}
-            </ul>
-        {% elseif value.type == 'text-list' %}
-            <ul class="mb-0">
-                {% for item in value.items %}
-                    <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-        {% elseif value.type == 'image' %}
-            <div class="w-50">
-                <img src="{{ value.url }}" alt="" class="mw-100">
-            </div>
-        {% elseif value.type == 'author-card' %}
-            <div>
-                {% if value.photo %}
-                    <div class="w-25 mb-2">
-                        <img src="{{ value.photo }}" alt="" class="mw-100">
-                    </div>
-                {% endif %}
-                {% if value.name %}
+		{% if value.type == 'text' %}
+			<div>
+				{{ value.text }}
+			</div>
+		{% elseif value.type == 'url' %}
+			<div>
+				<a href="{{ value.url }}">{{ value.url }}</a>
+			</div>
+		{% elseif value.type == 'url-list' %}
+			<ul class="mb-0">
+				{% for url in value.urls %}
+					<li><a href="{{ url }}">{{ url }}</a></li>
+				{% endfor %}
+			</ul>
+		{% elseif value.type == 'text-list' %}
+			<ul class="mb-0">
+				{% for item in value.items %}
+					<li>{{ item }}</li>
+				{% endfor %}
+			</ul>
+		{% elseif value.type == 'image' %}
+			<div class="w-50">
+				<img src="{{ value.url }}" alt="" class="mw-100" />
+			</div>
+		{% elseif value.type == 'author-card' %}
+			<div>
+				{% if value.photo %}
+					<div class="w-25 mb-2">
+						<img src="{{ value.photo }}" alt="" class="mw-100" />
+					</div>
+				{% endif %}
+				{% if value.name %}
 					{% if value.url %}
-						<div><a href="{{ value.url }}">{{ value.name }}</a></div>
+						<div>
+							<a href="{{ value.url }}">{{ value.name }}</a>
+						</div>
 					{% else %}
-						<div>{{ value.name }}</div>
+						<div>
+							{{ value.name }}
+						</div>
 					{% endif %}
-                {% elseif value.url %}
-                    <div><a href="{{ value.url }}">{{ value.url }}</a></div>
-                {% endif %}
-            </div>
-        {% elseif value.type == 'html-content' %}
-            <div>
-                {% if value.text %}
-                    {{ value.text }}
-                {% elseif value.html %}
-                    <code>{{ value.html }}</code>
-                {% endif %}
-            </div>
-        {% else %}
-            <pre>{{ value|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-        {% endif %}
-    {% endif %}
+				{% elseif value.url %}
+					<div>
+						<a href="{{ value.url }}">{{ value.url }}</a>
+					</div>
+				{% endif %}
+			</div>
+		{% elseif value.type == 'html-content' %}
+			<div>
+				{% if value.text %}
+					{{ value.text }}
+				{% elseif value.html %}
+					<code>{{ value.html }}</code>
+				{% endif %}
+			</div>
+		{% else %}
+			<pre>
+				{{ value|json_encode(constant('JSON_PRETTY_PRINT')) }}
+			</pre>
+		{% endif %}
+	{% endif %}
 
-    {% if check.help %}
+	{% if check.help %}
 		<div class="empty-property-block">
 			{% if check.help.html %}
-				<p class="mb-2">{{ check.help.html|raw }}</p>
+				<p class="mb-2">
+					{{ check.help.html|raw }}
+				</p>
 			{% endif %}
 
 			{% if check.help.example %}
 				<code class="html-example" lang="html">{{ check.help.example|html_example|raw }}</code>
 			{% endif %}
 		</div>
-    {% endif %}
+	{% endif %}
 
-    {% if check.status != 'found' and check.children %}
-        <div class="mt-2 ms-3">
-            {% for child in check.children %}
-                {% include 'pages/partials/h-entry-check.twig' with { check: child } only %}
-            {% endfor %}
-        </div>
-    {% endif %}
+	{% if check.status != 'found' and check.children %}
+		<div class="mt-2 ms-3">
+			{% for child in check.children %}
+				{% include 'pages/partials/h-entry-check.twig' with {
+					check: child
+				} only %}
+			{% endfor %}
+		</div>
+	{% endif %}
 </div>

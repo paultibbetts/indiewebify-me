@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Lato:400,700,700italic,900,400italic,300");
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700,700italic,900,400italic,300');
 
 /* flat-ui ported to bootstrap 5 */
 
@@ -28,8 +28,8 @@
 	--flat-gray-800: #2c3e50;
 	--flat-gray-900: #2c3e50;
 
-	--flat-font-sans-serif: "Lato", helvetica, arial, sans-serif;
-	--flat-font-monospace: monaco, menlo, consolas, "Courier New", monospace;
+	--flat-font-sans-serif: 'Lato', helvetica, arial, sans-serif;
+	--flat-font-monospace: monaco, menlo, consolas, 'Courier New', monospace;
 	--flat-body-font-size: 1.125rem;
 	--flat-body-font-weight: 400;
 	--flat-body-line-height: 1.6;

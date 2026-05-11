@@ -2,46 +2,69 @@
 
 {# -- Any additional <meta> tags that should be included in the <head> #}
 {% block headMeta %}
-{% endblock headMeta %}
 
+{% endblock %}
 
 {# -- Any additional <link> tags that should be included in the <head> #}
 {% block headLinks %}
-	<link href="/images/favicon.ico" rel="shortcut icon">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-	<link href="/css/flat-ui.css" rel="stylesheet">
-	<link href="/css/indiewebify.css" rel="stylesheet">
-{% endblock headLinks %}
-
+	<link href="/images/favicon.ico" rel="shortcut icon" />
+	<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+		rel="stylesheet"
+		integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+		crossorigin="anonymous"
+	/>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+	<link href="/css/flat-ui.css" rel="stylesheet" />
+	<link href="/css/indiewebify.css" rel="stylesheet" />
+{% endblock %}
 
 {# -- Any JavaScript that should be included before </head> -- #}
 {% block headJs %}
-{% endblock headJs %}
 
+{% endblock %}
 
 {# -- Page body -- #}
 {% block bodyHtml %}
+	<main class="container">
+		{% block bodyContent %}
+			<p>
+				This is placeholder body content.
+			</p>
+			<p>
+				To modify this page's contents in the Twig template, use <code>block bodyContent</code>
+			</p>
+			<p>
+				<a
+					href="https://twig.symfony.com/doc/3.x/templates.html#template-inheritance"
+					target="_blank"
+					rel="noopener noreferer"
+				>
+					Twig documentation
+				</a>
+			</p>
+		{% endblock %}
+	</main>
 
-<main class="container">
-{% block bodyContent %}
-	<p> This is placeholder body content. </p>
-	<p> To modify this page's contents in the Twig template, use <code>block bodyContent</code> </p>
-	<p> <a href="https://twig.symfony.com/doc/3.x/templates.html#template-inheritance" target="_blank" rel="noopener noreferer">Twig documentation</a> </p>
-{% endblock bodyContent %}
-</main>
-
-<footer class="container">
-	<div class="col-12 my-5 text-center">
-		<p> If you have any questions, <a href="https://indieweb.org/discuss">join the IndieWeb chat</a> </p>
-		<p> This code is <a href="https://github.com/indieweb/indiewebify-me/">open source</a>. Feel free to send a pull request or <a href="https://github.com/indieweb/indiewebify-me/issues/">file an issue</a>. </p>
-	</div>
-</footer>
-{% endblock bodyHtml %}
-
+	<footer class="container">
+		<div class="col-12 my-5 text-center">
+			<p>
+				If you have any questions, <a href="https://indieweb.org/discuss">join the IndieWeb chat</a>
+			</p>
+			<p>
+				This code is <a href="https://github.com/indieweb/indiewebify-me/">open source</a>. Feel free to send a
+				pull request or <a href="https://github.com/indieweb/indiewebify-me/issues/">file an issue</a>.
+			</p>
+		</div>
+	</footer>
+{% endblock %}
 
 {# -- Any JavaScript that should be included before </body> -- #}
 {% block bodyJs %}
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+		crossorigin="anonymous"
+	></script>
 	<script src="/js/indiewebifyme.js"></script>
-{% endblock bodyJs %}
+{% endblock %}
