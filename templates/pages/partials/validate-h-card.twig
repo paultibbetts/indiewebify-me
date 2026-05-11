@@ -55,7 +55,10 @@
 		<p> No h-cards were found on your site! Adding one can be as simple as this: </p>
 
 		{# TODO: this advice is old? #}
-		<p><code>&lt;a href="{{ url }}" class="h-card" rel="me">Your Name&lt;/a></code></p>
+		{% set example %}
+			<a href="{{ url }}" class="h-card" rel="me">Your name</a>
+		{% endset %}
+		<p><code class="html-example">{{ example|html_example|raw }}</code></p>
 
 		<p> You can also add other properties for a more detailed profile — see <a href="https://microformats.org/wiki/h-card">h-card on the microformats wiki</a> for a full list. </p>
 
@@ -78,7 +81,10 @@
 		{%~ else ~%}
 			<div class="empty-property-block photo-block">
 				<b class="d-block">Add your name!</b>
-				<code>&lt;span class="p-name">Your Name&lt;span></code>
+				{% set example %}
+					<span class="p-name">Your name</span>
+				{% endset %}
+				<code class="html-example">{{ example|html_example|raw }}</code>
 			</div>
 		{%~ endif ~%}
 		</div>
@@ -103,7 +109,10 @@
 		{%~ else ~%}
 			<div class="empty-property-block photo-block">
 				<b class="d-block">Add a photo!</b>
-				<code>&lt;img class="u-photo" src="{{ url }}…"></code>
+				{% set example %}
+					<img class="u-photo" src="{{ url }}…">
+				{% endset %}
+				<code class="html-example">{{ example|html_example|raw }}</code>
 			</div>
 		{%~ endif ~%}
 		</div>
@@ -119,7 +128,10 @@
 			{%~ else ~%}
 			<div class="empty-property-block">
 				<b class="d-block">Add your URLs!</b>
-				<code>&lt;a rel="me" class="u-url" href="…"></code>
+				{% set example %}
+					<a rel="me" class="u-url" href="…">URL</a>
+				{% endset %}
+				<code class="html-example">{{ example|html_example|raw }}</code>
 			</div>
 			{%~ endif ~%}
 		</div>
