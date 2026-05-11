@@ -47,8 +47,8 @@ class Microformats
         'post-office-box' => 'Post Office Box',
         'street-address' => 'Street number and name',
         'extended-address' => 'Extended address',
-        'locality' => 'City/town/village',
-        'region' => 'State/province/county',
+        'locality' => 'City/Town/Village',
+        'region' => 'State/Province/County',
         'postal-code' => 'Postal code',
         'country-name' => 'Country',
         'label' => 'Label',
@@ -66,18 +66,6 @@ class Microformats
         'sex' => 'Biological sex',
         'gender-identity' => 'Gender identity',
         'anniversary' => 'Anniversary',
-    ];
-
-    /**
-     * The core h-entry properties we will look for and recommend
-     */
-    private $core_entry_properties = [
-        'name',
-        'content',
-        'author',
-        'published',
-        'url',
-        'categories',
     ];
 
     public function parse(string $html, string $url): array
