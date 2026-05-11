@@ -6,6 +6,7 @@ namespace App\Tests\Domain;
 
 use App\Domain\PostType;
 use App\Domain\PostTypeDiscovery;
+use App\Service\Microformats;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use Mf2;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,7 +23,7 @@ final class PostTypeDiscoveryTest extends TestCase
 
         self::assertCount(1, $entries);
 
-        $discovery = new PostTypeDiscovery();
+        $discovery = new PostTypeDiscovery(new Microformats());
 
         $postType = $discovery->discover($entries[0]);
 

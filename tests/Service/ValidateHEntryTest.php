@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Service;
 
 use App\Domain\PostTypeDiscovery;
+use App\Service\Microformats;
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
 
@@ -12,7 +13,7 @@ final class ValidateHEntryTest extends TestCase
 {
     public function testValidates(): void
     {
-        $ptd = new PostTypeDiscovery();
+        $ptd = new PostTypeDiscovery(new Microformats());
         $validator = new ValidateHEntry($ptd);
 
         $url = 'https://example.com/';
