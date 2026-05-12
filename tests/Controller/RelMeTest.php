@@ -76,15 +76,15 @@ final class RelMeTest extends WebTestCase
             'url1' => $website,
             'url2' => $profile,
         ]));
-        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
         self::assertSame(
             ['pass', 'response', 'status', 'secure'],
-            array_keys($payload)
+            array_keys($body)
         );
-        self::assertFalse($payload['pass']);
+        self::assertFalse($body['pass']);
     }
 
     public function testRelMeCheckPassesWhenBacklinkIsFound(): void
@@ -123,13 +123,13 @@ final class RelMeTest extends WebTestCase
             'url1' => $website,
             'url2' => $profile,
         ]));
-        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(200, $payload['status']);
+        self::assertSame(200, $body['status']);
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
-        self::assertTrue($payload['pass']);
-        self::assertTrue($payload['secure']);
+        self::assertTrue($body['pass']);
+        self::assertTrue($body['secure']);
     }
 
     public function testRelMePageShowsFetchError(): void
@@ -162,10 +162,10 @@ final class RelMeTest extends WebTestCase
         $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
         ]));
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString($error, $payload);
+        self::assertStringContainsString($error, $body);
     }
 
     public function testRelMePageShowsNoRelMeLinksError(): void
@@ -197,10 +197,10 @@ final class RelMeTest extends WebTestCase
         $response = $this->get('/validate-rel-me/?' . http_build_query([
             'url' => $url,
         ]));
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString("No <code>rel=\"me\"</code> links could be found on {$url}", $payload);
+        self::assertStringContainsString("No <code>rel=\"me\"</code> links could be found on {$url}", $body);
     }
 
     public function testRelMeCheckFailsWhenBacklinkIsMissing(): void
@@ -235,13 +235,13 @@ final class RelMeTest extends WebTestCase
             'url1' => $website,
             'url2' => $profile,
         ]));
-        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(200, $payload['status']);
+        self::assertSame(200, $body['status']);
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
-        self::assertStringContainsString('Does not link back with rel=me', $payload['response']);
-        self::assertFalse($payload['pass']);
+        self::assertStringContainsString('Does not link back with rel=me', $body['response']);
+        self::assertFalse($body['pass']);
     }
 
     public function testRelMeCheckReportsInsecureBacklink(): void
@@ -281,13 +281,13 @@ final class RelMeTest extends WebTestCase
             'url1' => $https,
             'url2' => $profile,
         ]));
-        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(200, $payload['status']);
+        self::assertSame(200, $body['status']);
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
-        self::assertTrue($payload['pass']);
-        self::assertFalse($payload['secure']);
+        self::assertTrue($body['pass']);
+        self::assertFalse($body['secure']);
     }
 
     public function testRelMeCheckHasPublicCors(): void
