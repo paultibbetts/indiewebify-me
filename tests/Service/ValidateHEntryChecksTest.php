@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Domain\PostTypeDiscovery;
-use App\Service\Microformats;
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
 
@@ -188,7 +186,7 @@ final class ValidateHEntryChecksTest extends TestCase
         string $rawHtml,
         array $types,
     ): array {
-        $validator = new ValidateHEntry(new PostTypeDiscovery(new Microformats()));
+        $validator = new ValidateHEntry();
         $entry = [
             'type' => $types,
             'properties' => $properties,

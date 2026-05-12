@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\PostTypeDiscovery;
 use App\Domain\SiteHintsDetector;
 use App\Http\Client;
 use App\Responder\Responder;
@@ -275,6 +276,7 @@ final readonly class ValidateController
         ValidateHEntry $validator,
         SiteHintsDetector $siteHints,
         Microformats $microformats,
+        PostTypeDiscovery $ptd,
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
@@ -327,12 +329,16 @@ final readonly class ValidateController
         $entries = $microformats->findHEntries($mf);
 
         $report = $validator->validate($url, $entries, $html);
+
+        $postType = $report['found'] ? $ptd->discover($entries[0])->value : null;
+
         $hints = $siteHints->hintsFor($url, $html);
 
         return $this->responder->withTemplate(
             $response,
             'validate-h-entry.twig',
             [
+                'postType' => $postType,
                 'report' => $report,
                 'siteHints' => $hints,
                 'url' => $url,

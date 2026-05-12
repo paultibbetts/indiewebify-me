@@ -13,8 +13,7 @@ final class ValidateHEntryTest extends TestCase
 {
     public function testValidates(): void
     {
-        $ptd = new PostTypeDiscovery(new Microformats());
-        $validator = new ValidateHEntry($ptd);
+        $validator = new ValidateHEntry();
 
         $url = 'https://example.com/';
         $post = "{$url}post";
@@ -55,7 +54,6 @@ final class ValidateHEntryTest extends TestCase
 
         self::assertTrue($report['found']);
         self::assertSame($url, $report['url']);
-        self::assertSame('article', $report['postType']);
         self::assertSame('name', $report['checks'][0]['id']);
         self::assertSame('author', $report['checks'][1]['id']);
         self::assertSame('content', $report['checks'][2]['id']);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Http\Client;
-use App\Service\ValidateHEntry;
 use App\Tests\WebTestCase;
 
 final class HEntryTest extends WebTestCase
@@ -59,61 +58,37 @@ final class HEntryTest extends WebTestCase
         $content = 'This is the post content.';
         $author = 'Example Person';
         $photo = "{$url}photo.jpg";
+        $html = <<<HTML
+            <html>
+                <body>
+                    <article class="h-entry">
+                        <h1 class="p-name">Example post</h1>
+                        <a class="u-url" href="{$post}">permalink</a>
+                        <div class="p-author h-card">
+                            <a class="u-url" href="{$url}">
+                                <img class="u-photo" src="{$photo}" alt="">
+                                <span class="p-name">{$author}</span>
+                            </a>
+                        </div>
+                        <div class="e-content"><p>{$content}</p></div>
+                    </article>
+                </body>
+            </html>
+            HTML;
 
-        $report = [
-            'url' => $url,
-            'found' => true,
-            'postType' => 'article',
-            'checks' => [
-                [
-                    'id' => 'author',
-                    'label' => 'Author',
-                    'status' => 'pass',
-                    'state' => 'author.h-card.complete',
-                    'value' => [
-                        'type' => 'author-card',
-                        'name' => $author,
-                        'photo' => $photo,
-                        'url' => $url,
-                    ],
-                    'help' => null,
-                    'children' => [],
-                ],
-                [
-                    'id' => 'content',
-                    'label' => 'Content',
-                    'status' => 'pass',
-                    'state' => 'content.html',
-                    'value' => [
-                        'type' => 'html-content',
-                        'text' => $content,
-                    ],
-                    'help' => null,
-                    'children' => [],
-                ],
-                [
-                    'id' => 'url',
-                    'label' => 'URL',
-                    'status' => 'pass',
-                    'state' => 'url.valid',
-                    'value' => [
-                        'type' => 'url',
-                        'url' => $post,
-                    ],
-                    'help' => null,
-                    'children' => [],
-                ],
-            ],
-        ];
+        $client = $this->createMock(Client::class);
 
-        $validator = $this->createMock(ValidateHEntry::class);
-
-        $validator->expects(self::once())
-            ->method('validate')
+        $client->expects(self::once())
+            ->method('get')
             ->with($url)
-            ->willReturn($report);
+            ->willReturn([
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
+            ]);
 
-        $this->container()->set(ValidateHEntry::class, $validator);
+        $this->container()->set(Client::class, $client);
 
         $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => $url,
@@ -134,14 +109,6 @@ final class HEntryTest extends WebTestCase
         $url = 'https://example.com/';
         $html = '<html><head></head><body>No h-entry here.</body></html>';
 
-        $report = [
-            'url' => $url,
-            'found' => false,
-            'postType' => null,
-            'checks' => [],
-        ];
-
-        $validator = $this->createMock(ValidateHEntry::class);
         $client = $this->createMock(Client::class);
 
         $client->expects(self::once())
@@ -154,13 +121,7 @@ final class HEntryTest extends WebTestCase
                 'redirects' => [],
             ]);
 
-        $validator->expects(self::once())
-            ->method('validate')
-            ->with($url, [], $html)
-            ->willReturn($report);
-
         $this->container()->set(Client::class, $client);
-        $this->container()->set(ValidateHEntry::class, $validator);
 
         $response = $this->get('/validate-h-entry/?' . http_build_query([
             'url' => $url,

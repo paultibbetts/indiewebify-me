@@ -11,7 +11,7 @@ class PostTypeDiscovery
 {
     private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
 
-    public function __construct(private Microformats $microformats)
+    public function __construct(private readonly Microformats $microformats)
     {
     }
 

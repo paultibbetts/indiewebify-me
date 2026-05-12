@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Domain\PostTypeDiscovery;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use DateTimeImmutable;
 use Exception;
@@ -21,12 +20,11 @@ class ValidateHEntry
     private const array VALID_RSVP_VALUES = ['yes', 'no', 'maybe', 'interested'];
 
     public function __construct(
-        private readonly PostTypeDiscovery $ptd,
     ) {
     }
 
     /**
-     * @return array{url: string, found: bool, postType: string|null, checks: list<array<string, mixed>>}
+     * @return array{url: string, found: bool, checks: list<array<string, mixed>>}
      */
     public function validate(string $url, array $entries, string $html): array
     {
@@ -34,7 +32,6 @@ class ValidateHEntry
             return [
                 'url' => $url,
                 'found' => false,
-                'postType' => null,
                 'checks' => [],
             ];
         }
@@ -76,7 +73,6 @@ class ValidateHEntry
         return [
             'url' => $url,
             'found' => true,
-            'postType' => $this->ptd->discover($entry)->value,
             'checks' => $checks,
         ];
     }
