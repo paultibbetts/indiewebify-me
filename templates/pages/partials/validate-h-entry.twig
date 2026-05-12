@@ -1,12 +1,12 @@
 {% set no_h_entry_example %}
-	<article class="h-entry">
-		<div class="e-content p-name">
-			Hello world! This is my first indieweb post.
-		</div>
-		<a class="u-url" href="https://example.com/my-first-post">
-			Published <time class="dt-published">{{ now|date('Y-m-d H:i:sO') }}</time>
-		</a>
-	</article>
+<article class="h-entry">
+	<div class="e-content p-name">
+		Hello world! This is my first indieweb post.
+	</div>
+	<a class="u-url" href="https://example.com/my-first-post">
+		Published <time class="dt-published">{{ now|date('Y-m-d H:i:sO') }}</time>
+	</a>
+</article>
 {% endset %}
 
 <h3>
@@ -47,9 +47,7 @@
 		<p>
 			All you need to do is add microformats2 h-entry classnames, for example:
 		</p>
-		<pre class="p-2">
-			<code class="html-example">{{ no_h_entry_example|html_example|raw }}</code>
-		</pre>
+		<pre class="p-2"><code class="html-example">{{ no_h_entry_example|html_example|raw }}</code></pre>
 	</div>
 	<div>
 		<p>
