@@ -16,18 +16,18 @@ ready(function () {
 		return response.json();
 	}
 
-	let relMeResults = document.querySelectorAll('.rel-me-result');
+	const relMeResults = document.querySelectorAll('.rel-me-result');
 
 	if (relMeResults.length > 0) {
-		let results_url = document.querySelector('.results-url').href;
-		let progressBar = document.querySelector('.progress-bar');
+		const results_url = document.querySelector('.results-url').href;
+		const progressBar = document.querySelector('.progress-bar');
+		const progressIncrement = Math.round((1 / relMeResults.length) * 100);
 		let currentProgress = 0;
-		let progressIncrement = Math.round((1 / relMeResults.length) * 100);
 
 		for (let i = 0; i < relMeResults.length; i++) {
-			let url = relMeResults[i].querySelector('a');
-			let spinner = relMeResults[i].querySelector('.spinner-border');
-			let badge = relMeResults[i].querySelector('.badge');
+			const url = relMeResults[i].querySelector('a');
+			const spinner = relMeResults[i].querySelector('.spinner-border');
+			const badge = relMeResults[i].querySelector('.badge');
 
 			const parsed = new URL(url.href);
 			if (!['http:', 'https:'].includes(parsed.protocol)) {
@@ -35,7 +35,6 @@ ready(function () {
 			}
 
 			checkRelMe(results_url, url.href).then(function (json) {
-				// console.log(json);
 				badge.textContent = json.response;
 				if (json.status != 200) {
 					badge.textContent = `${json.response} (HTTP ${json.status})`;
@@ -47,15 +46,13 @@ ready(function () {
 					badge.classList.add('text-bg-warning');
 				}
 
-				spinner.remove(); // remove loading spinner
-				badge.classList.remove('d-none'); // display result badge
+				spinner.remove();
+				badge.classList.remove('d-none');
 
-				// extend the progress bar
 				currentProgress += progressIncrement;
 				if (currentProgress > 100) {
 					currentProgress = 100;
 				}
-				// console.log('currentProgress', currentProgress);
 				progressBar.setAttribute('aria-valuenow', currentProgress);
 				progressBar.style.width = currentProgress + '%';
 			});
