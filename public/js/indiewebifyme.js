@@ -8,7 +8,11 @@ function ready(fn) {
 
 ready(function () {
 	async function checkRelMe(url1, url2) {
-		const response = await fetch(`/rel-me-check/?url1=${url1}&url2=${url2}`);
+		const params = new URLSearchParams({
+			url1: url1,
+			url2: url2,
+		});
+		const response = await fetch(`/rel-me-check/?${params}`);
 		return response.json();
 	}
 
