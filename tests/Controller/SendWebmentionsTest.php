@@ -7,6 +7,7 @@ namespace App\Tests\Controller;
 use App\Http\Client;
 use App\Service\WebmentionSender;
 use App\Tests\WebTestCase;
+use DOMElement;
 
 final class SendWebmentionsTest extends WebTestCase
 {
@@ -103,9 +104,17 @@ final class SendWebmentionsTest extends WebTestCase
             'url' => $url,
         ]);
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
+        $xpath = self::xpathFor($body);
+        $input = $xpath->query('//form[contains(@action, "/send-webmentions/")]//input[@name="url"]')->item(0);
+
+        if (!($input instanceof DOMElement)) {
+            self::fail('expected URL input element');
+        }
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('sent 2 webmentions', $payload);
+        self::assertStringContainsString('sent 2 webmentions', $body);
+        self::assertNotNull($input);
+        self::assertSame($url, $input->getAttribute('value'));
     }
 }
