@@ -29,6 +29,11 @@ ready(function () {
 			let spinner = relMeResults[i].querySelector('.spinner-border');
 			let badge = relMeResults[i].querySelector('.badge');
 
+			const parsed = new URL(url.href);
+			if (!['http:', 'https:'].includes(parsed.protocol)) {
+				continue;
+			}
+
 			checkRelMe(results_url, url.href).then(function (json) {
 				// console.log(json);
 				badge.textContent = json.response;
