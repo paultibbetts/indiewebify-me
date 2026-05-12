@@ -2,8 +2,4 @@
 
 declare(strict_types=1);
 
-# debug: display all errors
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
 (require dirname(__DIR__) . '/config/bootstrap.php')->run();
