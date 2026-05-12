@@ -37,13 +37,26 @@ final class RelMeTest extends WebTestCase
     public function testRelMeCheckRequiresBothUrls(): void
     {
         $response = $this->get('/rel-me-check/?' . http_build_query([
-            'url1' => IndieWeb\normaliseUrl('example'),
+            'url1' => 'http://example.com/',
         ]));
-        $payload = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
         self::assertSame(400, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
-        self::assertNotNull($payload['response']);
+        self::assertStringContainsString('Please provide both', $body['response']);
+    }
+
+    public function testRelMeCheckRequiresValidUrls(): void
+    {
+        $response = $this->get('/rel-me-check/?' . http_build_query([
+            'url1' => 'https://example.com/',
+            'url2' => 'mailto:my@email',
+        ]));
+        $body = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('Only http and https', $body['response']);
     }
 
     public function testRelMeCheckReturnsJsonWhenProfileFetchFails(): void

@@ -47,6 +47,15 @@ final readonly class ValidateController
             return $this->responder->withJson($response, $response_data);
         }
 
+        foreach (['url1' => $url1, 'url2' => $url2] as $name => $url) {
+            if (!$this->isHttpUrl($url)) {
+                $response = $response->withStatus(400);
+                $response_data['response'] = "Error: Only http and https URLs can be checked. Invalid parameter: {$name}";
+
+                return $this->responder->withJson($response, $response_data);
+            }
+        }
+
         $url1 = UrlNormalizer::normalize($url1);
         $url2 = UrlNormalizer::normalize($url2);
         $is_url_https = parse_url((string) $url1, PHP_URL_SCHEME) == 'https';
@@ -80,6 +89,13 @@ final readonly class ValidateController
         $response_data['response'] = 'Does not link back with rel=me';
 
         return $this->responder->withJson($response, $response_data);
+    }
+
+    private function isHttpURL(string $url): bool
+    {
+        $scheme = parse_url(trim($url), PHP_URL_SCHEME);
+
+        return $scheme === null || in_array($scheme, ['http', 'https'], true);
     }
 
     /**
