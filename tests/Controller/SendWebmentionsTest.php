@@ -13,13 +13,22 @@ final class SendWebmentionsTest extends WebTestCase
 {
     public function testSendWebmentionsPageShowsForm(): void
     {
-        $response = $this->get('/send-webmentions/');
+        $url = 'http://example.com/';
+        $response = $this->get('/send-webmentions/?' . http_build_query([
+            'url' => $url,
+        ]));
         $body = (string) $response->getBody();
         $xpath = self::xpathFor($body);
         $query = '//form[contains(@action, "/send-webmentions/")]//input[@name="url"]';
+        $input = $xpath->query($query)->item(0);
+
+        if (!($input instanceof DOMElement)) {
+            self::fail('expected URL input element');
+        }
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(1, $xpath->query($query)->length);
+        self::assertNotNull($input);
+        self::assertSame($url, $input->getAttribute('value'));
     }
 
     public function testSendWebmentionsRequiresAUrl(): void
