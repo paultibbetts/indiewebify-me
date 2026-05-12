@@ -27,7 +27,6 @@ final class SendWebmentionsTest extends WebTestCase
         }
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertNotNull($input);
         self::assertSame($url, $input->getAttribute('value'));
     }
 
@@ -123,7 +122,6 @@ final class SendWebmentionsTest extends WebTestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('sent 2 webmentions', $body);
-        self::assertNotNull($input);
         self::assertSame($url, $input->getAttribute('value'));
     }
 }
