@@ -89,8 +89,8 @@ final class RelMeTest extends WebTestCase
 
     public function testRelMeCheckPassesWhenBacklinkIsFound(): void
     {
-        $website = 'https://example.com/';
-        $profile = 'https://profile.example/';
+        $website = 'https://example.com/?a=1&b=2#me';
+        $profile = 'https://profile.example/?x=1&y=2#about';
         $validBacklink = '<a rel="me" href="' . $website . '">Website</a>';
 
         $relMe = $this->getMockBuilder(RelMe::class)
