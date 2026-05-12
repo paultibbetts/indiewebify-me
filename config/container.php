@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use App\Twig\HtmlExampleExtension;
 use DI\Bridge\Slim\Bridge;
+use GuzzleHttp\{
+    Client,
+    RequestOptions
+};
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\{
@@ -20,6 +24,12 @@ return [
     App::class => Bridge::create(...),
 
     ResponseFactoryInterface::class => fn (ContainerInterface $container) => AppFactory::determineResponseFactory(),
+
+    Client::class => fn () => new Client([
+        RequestOptions::ALLOW_REDIRECTS => [
+            'track_redirects' => true,
+       ],
+    ]),
 
     // The Slim RouterParser
     RouteParserInterface::class => fn (ContainerInterface $container) => $container->get(App::class)->getRouteCollector()->getRouteParser(),

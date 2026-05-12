@@ -8,11 +8,14 @@ use GuzzleHttp\{
     Client as GuzzleClient,
     Exception\RequestException,
     Exception\TransferException,
-    RequestOptions
 };
 
 class Client
 {
+    public function __construct(private GuzzleClient $client)
+    {
+    }
+
     public function get(string $url): array
     {
         $response = null;
@@ -25,13 +28,7 @@ class Client
         ], null);
 
         try {
-            $client = new GuzzleClient([
-                RequestOptions::ALLOW_REDIRECTS => [
-                    'track_redirects' => true,
-                ],
-            ]);
-
-            $response = $client->get($url);
+            $response = $this->client->get($url);
         } catch (RequestException $e) {
             $output['error'] = $e->getMessage();
 
