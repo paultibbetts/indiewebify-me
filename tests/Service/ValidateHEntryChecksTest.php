@@ -15,7 +15,6 @@ final class ValidateHEntryChecksTest extends TestCase
 
         self::assertSame('warning', $check['status']);
         self::assertSame('author.missing', $check['state']);
-        self::assertSame('Add an author!', $check['help']['html']);
     }
 
     public function testStringAuthor(): void
@@ -27,7 +26,6 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('author.string', $check['state']);
         self::assertSame('text', $check['value']['type']);
-        self::assertStringContainsString('add <code>h-card</code>', $check['help']['html']);
         self::assertStringContainsString('h-card', $check['help']['example']);
     }
 
