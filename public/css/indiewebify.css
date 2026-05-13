@@ -56,9 +56,8 @@ li {
 /* HTML examples */
 
 pre code.html-example {
-	background: none;
-	border: none;
 	white-space: pre-wrap;
+	overflow: auto;
 }
 
 .html-example {
