@@ -147,6 +147,14 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('rsvp.missing', $check['state']);
     }
 
+    public function testMissingContent(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry(), 'content');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('content.missing', $check['state']);
+    }
+
     public function testMissingPublished(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry(), 'published');
@@ -185,7 +193,27 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('published.malformed', $check['state']);
     }
 
+    public function testMissingUrl(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry(), 'url');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('url.missing', $check['state']);
+    }
+
+    public function testMalformedUrl(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'url' => ['malformed'],
+        ]), 'url');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('url.malformed', $check['state']);
+    }
+
     /**
+     * Returns the check for parsed microformats data.
+     *
      * @param array<string, list<mixed>> $properties
      *
      * @return list<array<string, mixed>>
@@ -202,6 +230,8 @@ final class ValidateHEntryChecksTest extends TestCase
     }
 
     /**
+     * Returns the check for raw HTML.
+     *
      * @return list<array<string, mixed>>
      */
     private function checksForHtmlEvidence(string $rawHtml): array
@@ -214,6 +244,8 @@ final class ValidateHEntryChecksTest extends TestCase
     }
 
     /**
+     * Returns the check for a h-entry.
+     *
      * @param array<string, list<mixed>> $properties
      * @param list<string> $types
      *
@@ -234,6 +266,8 @@ final class ValidateHEntryChecksTest extends TestCase
     }
 
     /**
+     * Returns the check with the given id.
+     *
      * @param list<array<string, mixed>> $checks
      *
      * @return array<string, mixed>
@@ -250,6 +284,8 @@ final class ValidateHEntryChecksTest extends TestCase
     }
 
     /**
+     * Returns the child check.
+     *
      * @param array<string, mixed> $check
      *
      * @return array<string, mixed>
@@ -266,6 +302,8 @@ final class ValidateHEntryChecksTest extends TestCase
     }
 
     /**
+     * Creates an author card.
+     *
      * @return array{type: list<string>, properties: array<string, list<string>>}
      */
     private function authorCard(?string $photo): array
