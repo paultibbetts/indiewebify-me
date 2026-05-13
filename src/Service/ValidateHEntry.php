@@ -10,6 +10,7 @@ namespace App\Service;
 
 use BarnabyWalters\Mf2 as Mf2Helper;
 use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 
 class ValidateHEntry
@@ -362,7 +363,7 @@ class ValidateHEntry
             );
         }
 
-        if (!$this->isDateTimeValid($published)) {
+        if (!$this->isValidPublishedDate($published)) {
             return $this->checkResult(
                 'published',
                 'Published',
@@ -370,12 +371,60 @@ class ValidateHEntry
                 'published.malformed',
                 $this->textValue($published),
                 [
-                    'html' => 'The datetime is not valid ISO-8601.',
+                    'html' => 'The publication date is not valid.',
+                    'example' => '<time class="dt-published" datetime="YYYY-MM-DDTHH:MM:SS+00:00">The Date</time>',
                 ],
             );
         }
 
         return $this->checkResult('published', 'Published', self::FOUND, 'published.valid', $this->textValue($published));
+    }
+
+    private function isValidPublishedDate(string $value): bool
+    {
+        $value = trim($value);
+
+        return $this->isValidDateOnly($value) || $this->isValidDateTime($value);
+    }
+
+    private function isValidDateOnly(string $value): bool
+    {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return false;
+        }
+
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value); // ! resets the time to 00:00:00
+
+        return $date !== false && $date->format('Y-m-d') === $value;
+    }
+
+    private function isValidDateTime(string $value): bool
+    {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/', $value)) {
+            return false;
+        }
+
+        $endsWithZ = str_ends_with($value, 'Z');
+        $dateTimeWithUTCDesignator = 'Y-m-d\TH:i:s\Z';
+        $dateTimeWithTimezoneOffset = 'Y-m-d\TH:i:sP';
+
+        $format = $endsWithZ
+            ? $dateTimeWithUTCDesignator
+            : $dateTimeWithTimezoneOffset;
+
+
+        $date = DateTimeImmutable::createFromFormat($format, $value);
+
+
+        if ($date === false) {
+            return false;
+        }
+
+        if ($endsWithZ) {
+            return $date->setTimezone(new DateTimeZone('UTC'))->format($dateTimeWithUTCDesignator) === $value;
+        }
+
+        return $date->format($dateTimeWithTimezoneOffset) === $value;
     }
 
     /**

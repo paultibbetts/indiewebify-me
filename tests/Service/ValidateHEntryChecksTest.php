@@ -147,6 +147,44 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('rsvp.missing', $check['state']);
     }
 
+    public function testMissingPublished(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry(), 'published');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('published.missing', $check['state']);
+    }
+
+    public function testPublishedDateOnly(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'published' => ['2026-05-13'],
+        ]), 'published');
+
+        self::assertSame('found', $check['status']);
+        self::assertSame('published.valid', $check['state']);
+    }
+
+    public function testPublishedDateTime(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'published' => ['2026-05-13T11:57:46+01:00'],
+        ]), 'published');
+
+        self::assertSame('found', $check['status'], json_encode($check));
+        self::assertSame('published.valid', $check['state']);
+    }
+
+    public function testPublishedMalformed(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'published' => ['now'],
+        ]), 'published');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('published.malformed', $check['state']);
+    }
+
     /**
      * @param array<string, list<mixed>> $properties
      *
