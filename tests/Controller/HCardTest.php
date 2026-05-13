@@ -26,10 +26,10 @@ final class HCardTest extends WebTestCase
             'url' => '',
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('Empty URLs lead nowhere!', $payload);
+        self::assertStringContainsString('Empty URLs lead nowhere!', $body);
     }
 
     public function testHCardPageAcceptsBareDomain(): void
@@ -88,13 +88,13 @@ final class HCardTest extends WebTestCase
             'url' => $url,
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString($name, $payload);
-        self::assertStringContainsString($url, $payload);
-        self::assertStringContainsString($photo, $payload);
-        self::assertStringContainsString($note, $payload);
+        self::assertStringContainsString($name, $body);
+        self::assertStringContainsString($url, $body);
+        self::assertStringContainsString($photo, $body);
+        self::assertStringContainsString($note, $body);
     }
 
     public function testHCardPageShowsNoHCardError(): void
@@ -120,10 +120,10 @@ final class HCardTest extends WebTestCase
             'url' => $url,
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('No h-cards were found', $payload);
+        self::assertStringContainsString('No h-cards were found', $body);
     }
 
     public function testHCardPageShowsFetchOrParseError(): void
@@ -149,9 +149,9 @@ final class HCardTest extends WebTestCase
             'url' => $url,
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString($error, $payload);
+        self::assertStringContainsString($error, $body);
     }
 }

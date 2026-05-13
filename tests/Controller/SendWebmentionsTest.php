@@ -38,10 +38,10 @@ final class SendWebmentionsTest extends WebTestCase
             'url' => $url,
         ]);
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('Empty URLs lead nowhere!', $payload);
+        self::assertStringContainsString('Empty URLs lead nowhere!', $body);
     }
 
     public function testSendWebmentionsFindsHEntries(): void
@@ -67,10 +67,10 @@ final class SendWebmentionsTest extends WebTestCase
             'url' => $url,
         ]);
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString("No h-entry was found on {$url}", $payload);
+        self::assertStringContainsString("No h-entry was found on {$url}", $body);
     }
 
     public function testSendWebmentionsSendsMentions(): void

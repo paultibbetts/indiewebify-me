@@ -26,10 +26,10 @@ final class HEntryTest extends WebTestCase
             'url' => '',
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('Empty URLs lead nowhere!', $payload);
+        self::assertStringContainsString('Empty URLs lead nowhere!', $body);
     }
 
     public function testHEntryPageAcceptsBareDomain(): void
@@ -94,14 +94,14 @@ final class HEntryTest extends WebTestCase
             'url' => $url,
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString($content, $payload);
-        self::assertStringContainsString($author, $payload);
-        self::assertStringContainsString($photo, $payload);
-        self::assertStringContainsString('article', $payload);
-        self::assertStringContainsString($post, $payload);
+        self::assertStringContainsString($content, $body);
+        self::assertStringContainsString($author, $body);
+        self::assertStringContainsString($photo, $body);
+        self::assertStringContainsString('article', $body);
+        self::assertStringContainsString($post, $body);
     }
 
     public function testHEntryPageShowsNoHEntryError(): void
@@ -127,9 +127,9 @@ final class HEntryTest extends WebTestCase
             'url' => $url,
         ]));
 
-        $payload = (string) $response->getBody();
+        $body = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString('No h-entry found', $payload);
+        self::assertStringContainsString('No h-entry found', $body);
     }
 }
