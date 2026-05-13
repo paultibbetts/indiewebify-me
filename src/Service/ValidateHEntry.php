@@ -69,6 +69,7 @@ class ValidateHEntry
         $checks[] = $this->checkContent($entry);
         $checks[] = $this->checkPublished($entry);
         $checks[] = $this->checkUrl($entry);
+        $checks[] = $this->checkSyndication($entry, $html);
         $checks[] = $this->checkCategory($entry);
 
         return [
@@ -463,6 +464,84 @@ class ValidateHEntry
         }
 
         return $this->checkResult('url', 'URL', self::FOUND, 'url.valid', $this->urlValue($url));
+    }
+
+    private function checkSyndication(array $entry, string $rawHtml): array
+    {
+        $id = 'syndication';
+        $label = 'Syndicated Copies';
+
+        $syndication = $this->allProperties($entry, 'syndication');
+        $intentDetected = $this->hasClassIntent($rawHtml, 'u-syndication');
+
+        $example = '<a rel="syndication" class="u-syndication" href="…">…</a>';
+
+        if ($syndication === []) {
+            if ($intentDetected) {
+                return $this->checkResult(
+                    $id,
+                    $label,
+                    self::WARNING,
+                    'syndication.intent-detected-but-no-parsed-value',
+                    help: [
+                        'html' => 'The HTML suggests this includes syndicated copies, but no values were parsed.',
+                        'example' => $example,
+                    ],
+                );
+            }
+
+            return $this->checkResult(
+                $id,
+                $label,
+                self::INFO,
+                'syndication.missing',
+                help: [
+                    'html' => 'Add URLs of <a href="https://indieweb.org/POSSE">POSSEd</a> copies!',
+                    'example' => $example,
+                ],
+            );
+        }
+
+        $children = [];
+        $hasWarnings = false;
+        $urls = [];
+
+        foreach ($syndication as $index => $value) {
+            $childId = sprintf('syndication.%d', $index + 1);
+            $url = is_scalar($value) ? trim((string) $value) : null;
+
+            if (!$this->looksLikeUrl($url)) {
+                $hasWarnings = true;
+                $children[] = $this->checkResult(
+                    $childId,
+                    'Syndicated Copy',
+                    self::WARNING,
+                    'syndication.url.malformed',
+                    help: [
+                        'html' => 'This value is not a URL',
+                        'example' => $example,
+                    ]
+                );
+                continue;
+            }
+            $urls[] = $value;
+            $children[] = $this->checkResult(
+                $childId,
+                'Syndicated Copy',
+                self::FOUND,
+                'syndication.url.valid',
+                $this->urlValue($value),
+            );
+        }
+
+        return $this->checkResult(
+            $id,
+            $label,
+            $hasWarnings ? self::WARNING : self::FOUND,
+            $hasWarnings ? 'syndication.malformed' : 'syndication.valid',
+            $this->urlListValue($urls),
+            children: $children,
+        );
     }
 
     /**

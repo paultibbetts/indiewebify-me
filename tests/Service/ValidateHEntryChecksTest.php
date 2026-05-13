@@ -211,6 +211,76 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('url.malformed', $check['state']);
     }
 
+    public function testMissingCategories(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry(), 'category');
+
+        self::assertSame('info', $check['status']);
+        self::assertSame('category.missing', $check['state']);
+    }
+
+    public function testValidCategories(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'category' => ['indieweb', 'testing'],
+        ]), 'category');
+
+        self::assertSame('found', $check['status']);
+    }
+
+    public function testMissingSyndication(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry(), 'syndication');
+
+        self::assertSame('info', $check['status']);
+        self::assertSame('syndication.missing', $check['state']);
+    }
+
+    public function testValidSyndication(): void
+    {
+        $mastodon = 'https://indieweb.social/@example/123';
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'syndication' => [
+                $mastodon,
+                'https://bsky.app/profile/example.person/post/abc',
+            ],
+        ]), 'syndication');
+
+        self::assertSame('found', $check['status']);
+        self::assertSame('syndication.valid', $check['state']);
+        self::assertNull($check['help']);
+        self::assertSame('url-list', $check['value']['type']);
+        self::assertSame('syndication.url.valid', $check['children'][0]['state']);
+        self::assertSame('url', $check['children'][0]['value']['type']);
+        self::assertSame($mastodon, $check['children'][0]['value']['url']);
+    }
+
+    public function testMalformedSyndication(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'syndication' => [
+                'mastodon',
+                'bluesky',
+            ],
+        ]), 'syndication');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('syndication.malformed', $check['state']);
+        self::assertCount(2, $check['children']);
+        self::assertSame('syndication.url.malformed', $check['children'][0]['state']);
+        self::assertSame('syndication.url.malformed', $check['children'][1]['state']);
+    }
+
+    public function testSyndicationIntent(): void
+    {
+        $check = $this->checkFor($this->checksForHtmlEvidence(
+            '<article class="h-entry"><a class="u-syndication">https://indieweb.social/post</a></article>',
+        ), 'syndication');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('syndication.intent-detected-but-no-parsed-value', $check['state']);
+    }
+
     /**
      * Returns the check for parsed microformats data.
      *
