@@ -33,7 +33,13 @@ test('checks rel-me results and updates the badge and progress UI', async () => 
 	<ul>
 		<li class="rel-me-result">
 			<a href="https://profile.example/me?x=1&y=2#about">profile</a>
-			<a href="mailto:my@email">email</a>
+			<div class="spinner-border spinner-border-sm" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+			<span class="badge d-none">badge text</span>
+		</li>
+		<li class="rel-me-result">
+			<a href="mailto:me@example.com">email</a>
 			<div class="spinner-border spinner-border-sm" role="status">
 				<span class="visually-hidden">Loading...</span>
 			</div>
@@ -48,13 +54,11 @@ test('checks rel-me results and updates the badge and progress UI', async () => 
 	);
 
 	const { window } = dom;
-	let requestedUrl;
-	let fetched = 0;
+	let requestedUrls = [];
 
 	// mock fetch used by the script
 	window.fetch = async (url) => {
-		requestedUrl = url;
-		fetched++;
+		requestedUrls.push(url);
 		return {
 			json: async () => ({
 				pass: true,
@@ -65,20 +69,19 @@ test('checks rel-me results and updates the badge and progress UI', async () => 
 	};
 
 	window.eval(script); // run indiewebify script
-	window.document.dispatchEvent(new window.Event('DOMContentLoaded')); // activate indiewebify script
 
 	await waitFor(() => {
 		assert.equal(window.document.querySelector('.badge').textContent, 'Works perfectly');
 	});
-
-	assert.equal(fetched, 1); // the script ignores the non-http link
 
 	assert.equal(window.document.querySelector('.spinner-border'), null);
 	assert.equal(window.document.querySelector('.badge').classList.contains('text-bg-success'), true);
 	assert.equal(window.document.querySelector('.badge').classList.contains('d-none'), false);
 	assert.equal(window.document.querySelector('.progress-bar').getAttribute('aria-valuenow'), '100');
 
-	assert.ok(requestedUrl);
+	assert.equal(1, requestedUrls.length);
+	const requestedUrl = requestedUrls[0];
+	assert.ok(requestedUrls);
 	const parsed = new URL(requestedUrl, window.location.href);
 
 	assert.equal(parsed.pathname, '/rel-me-check/');
