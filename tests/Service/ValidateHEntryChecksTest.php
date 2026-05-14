@@ -224,6 +224,7 @@ final class ValidateHEntryChecksTest extends TestCase
         ]), 'category');
 
         self::assertSame('found', $check['status']);
+        self::assertSame('category.present', $check['state']);
     }
 
     public function testMissingSyndication(): void
