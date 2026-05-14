@@ -6,8 +6,10 @@ namespace App\Tests\Http;
 
 use App\Http\Client;
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -53,11 +55,31 @@ final class ClientTest extends TestCase
         self::assertStringContainsString("The site {$url} returned 404 Not Found when we tried to fetch it", $result['error']);
     }
 
-    /*
-    */
-    private function mockClient(Response ...$responses): Client
+    public function testReturnsFriendlyErrorWhenConnectionFail(): void
     {
-        $mock = new MockHandler($responses);
+        $url = 'https://example.com/';
+
+        $client = $this->mockClient(
+            new ConnectException(
+                'Connection Refused',
+                new Request('GET', $url)
+            )
+        );
+
+        $result = $client->get($url);
+
+        self::assertNull($result['status']);
+        self::assertNull($result['body']);
+        self::assertNull($result['redirects']);
+        self::assertSame(
+            "We could not fetch {$url}. Check that the site is reachable and try again.",
+            $result['error']
+        );
+    }
+
+    private function mockClient(Response|\Throwable ...$queue): Client
+    {
+        $mock = new MockHandler($queue);
 
         $guzzle = new GuzzleClient([
             'handler' => HandlerStack::create($mock),
