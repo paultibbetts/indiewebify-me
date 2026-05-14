@@ -15,16 +15,11 @@ final class ClientTest extends TestCase
 {
     public function testTracksRedirects(): void
     {
-        $mock = new MockHandler([
+
+        $client = $this->mockClient(
             new Response(301, ['Location' => 'https://example.com/end']),
             new Response(200, [], 'end body'),
-        ]);
-
-        $guzzle = new GuzzleClient([
-            'handler' => HandlerStack::create($mock),
-        ]);
-
-        $client = new Client($guzzle);
+        );
 
         $result = $client->get('https://example.com/start');
 
@@ -42,5 +37,32 @@ final class ClientTest extends TestCase
                 'status' => 200,
             ],
         ], $result['redirects']);
+    }
+
+    public function testReturnsError(): void
+    {
+        $client = $this->mockClient(
+            new Response(404),
+        );
+
+        $url = 'https://example.com/fail';
+
+        $result = $client->get($url);
+
+        self::assertSame(404, $result['status']);
+        self::assertStringContainsString("The site {$url} returned 404 Not Found when we tried to fetch it", $result['error']);
+    }
+
+    /*
+    */
+    private function mockClient(Response ...$responses): Client
+    {
+        $mock = new MockHandler($responses);
+
+        $guzzle = new GuzzleClient([
+            'handler' => HandlerStack::create($mock),
+        ]);
+
+        return new Client($guzzle);
     }
 }
