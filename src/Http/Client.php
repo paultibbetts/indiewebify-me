@@ -8,6 +8,7 @@ use GuzzleHttp\{
     Client as GuzzleClient,
     Exception\RequestException,
     Exception\TransferException,
+    RequestOptions
 };
 
 class Client
@@ -28,7 +29,11 @@ class Client
         ], null);
 
         try {
-            $response = $this->client->get($url);
+            $response = $this->client->get($url, [
+                RequestOptions::ALLOW_REDIRECTS => [
+                    'track_redirects' => true,
+               ],
+            ]);
         } catch (RequestException $e) {
             $output['error'] = $e->getMessage();
 
