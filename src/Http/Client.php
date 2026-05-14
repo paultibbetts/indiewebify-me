@@ -32,7 +32,7 @@ class Client
             $response = $this->client->get($url, [
                 RequestOptions::ALLOW_REDIRECTS => [
                     'track_redirects' => true,
-               ],
+                ],
             ]);
         } catch (RequestException $e) {
             $output['error'] = $e->getMessage();

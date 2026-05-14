@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Domain\PostTypeDiscovery;
-use App\Service\Microformats;
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
 

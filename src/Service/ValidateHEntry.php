@@ -413,9 +413,7 @@ class ValidateHEntry
             ? $dateTimeWithUTCDesignator
             : $dateTimeWithTimezoneOffset;
 
-
         $date = DateTimeImmutable::createFromFormat($format, $value);
-
 
         if ($date === false) {
             return false;
