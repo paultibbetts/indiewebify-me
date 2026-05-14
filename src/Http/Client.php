@@ -12,7 +12,7 @@ use GuzzleHttp\{
 
 class Client
 {
-    public function __construct(private GuzzleClient $client)
+    public function __construct(private readonly GuzzleClient $client)
     {
     }
 
