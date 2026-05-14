@@ -24,6 +24,15 @@ ready(function () {
 		const progressIncrement = Math.round((1 / relMeResults.length) * 100);
 		let currentProgress = 0;
 
+		function updateProgress() {
+			currentProgress += progressIncrement;
+			if (currentProgress > 100) {
+				currentProgress = 100;
+			}
+			progressBar.setAttribute('aria-valuenow', currentProgress);
+			progressBar.style.width = currentProgress + '%';
+		}
+
 		for (let i = 0; i < relMeResults.length; i++) {
 			const url = relMeResults[i].querySelector('a');
 			const spinner = relMeResults[i].querySelector('.spinner-border');
@@ -31,6 +40,11 @@ ready(function () {
 
 			const parsed = new URL(url.href);
 			if (!['http:', 'https:'].includes(parsed.protocol)) {
+				spinner.remove();
+				badge.textContent = 'Skipped';
+				badge.classList.add('text-bg-secondary');
+				badge.classList.remove('d-none');
+				updateProgress();
 				continue;
 			}
 
@@ -48,13 +62,7 @@ ready(function () {
 
 				spinner.remove();
 				badge.classList.remove('d-none');
-
-				currentProgress += progressIncrement;
-				if (currentProgress > 100) {
-					currentProgress = 100;
-				}
-				progressBar.setAttribute('aria-valuenow', currentProgress);
-				progressBar.style.width = currentProgress + '%';
+				updateProgress();
 			});
 		}
 	}
