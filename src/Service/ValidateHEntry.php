@@ -822,17 +822,6 @@ class ValidateHEntry
             && in_array($type, $value['type'], true);
     }
 
-    private function isDateTimeValid(string $date): bool
-    {
-        try {
-            new DateTimeImmutable($date);
-
-            return true;
-        } catch (Exception) {
-            return false;
-        }
-    }
-
     private function looksLikeUrl(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) !== false;
