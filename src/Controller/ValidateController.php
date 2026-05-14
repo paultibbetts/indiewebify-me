@@ -264,7 +264,7 @@ final readonly class ValidateController
             $card = $cards_response['representative'];
         }
 
-        $properties = $mfService->parseHCardProperties($card);
+        $properties = $mfService->parseHCardProperties($card, $url);
 
         $hints = $siteHints->hintsFor($url, $html);
 

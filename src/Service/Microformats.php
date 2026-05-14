@@ -138,7 +138,7 @@ class Microformats
      *       additional: array<string, list<string>>
      *   }
      */
-    public function parseHCardProperties(array $h_card): array
+    public function parseHCardProperties(array $h_card, string $pageUrl): array
     {
         # default each of the core properties to empty string
         $core = array_fill_keys($this->core_card_properties, '');
@@ -147,7 +147,11 @@ class Microformats
         $additional = [];
 
         foreach ($this->core_card_properties as $name) {
-            $core[$name] = $this->propertyValues($h_card, $name);
+            $values = $this->propertyValues($h_card, $name);
+            if ($values && $name === 'photo' && $values[0] === $pageUrl) {
+                continue;
+            }
+            $core[$name] = $values;
         }
 
         foreach ($this->additional_card_properties as $name => $label) {

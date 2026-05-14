@@ -97,6 +97,50 @@ final class HCardTest extends WebTestCase
         self::assertStringContainsString($note, $body);
     }
 
+    public function testHCardPageDoesNotShowPhotoIfBadImageMarkup(): void
+    {
+        $name = 'Example Person';
+        $url = 'https://example.com/';
+        $photo = "{$url}photo.jpg";
+        $note = 'A test h-card';
+        $html = <<<HTML
+            <html>
+                <body>
+                    <div class="h-card">
+                        <p class="p-name">{$name}</p>
+                        <a class="u-url u-uid" href="{$url}">{$url}</a>
+                        <img class="u-photo" href="{$photo}" alt=""><!-- href not src -->
+                        <p class="p-note">{$note}</p>
+                    </div>
+                </body>
+            </html>
+            HTML;
+
+        $client = $this->createMock(Client::class);
+
+        $client->expects(self::once())
+            ->method('get')
+            ->with($url)
+            ->willReturn([
+                'status' => 200,
+                'body' => $html,
+                'error' => null,
+                'redirects' => [],
+            ]);
+
+        $this->container()->set(Client::class, $client);
+
+        $response = $this->getFollowingRedirects('/validate-h-card/?' . http_build_query([
+            'url' => $url,
+        ]));
+
+        $body = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringNotContainsString($photo, $body);
+        self::assertStringContainsString('Add a photo', $body);
+    }
+
     public function testHCardPageShowsNoHCardError(): void
     {
         $url = 'https://example.com/';
