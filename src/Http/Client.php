@@ -73,7 +73,7 @@ class Client
             foreach ($redirectHistory as $key => $value) {
                 $redirects[$key] = [
                     'location' => $value,
-                    'status' => $redirectStatus[$key],
+                    'status' => (int) $redirectStatus[$key],
                 ];
             }
 
