@@ -122,11 +122,19 @@ I am not aiming to add new features or fix any of the (currently) 50 issues open
 - started a test suite
 -   - /validate-rel-me
 -   - /send-webmentions
+-   - /validate-h-card
+-   - /validate-h-entry
 - fixed a few minor errors with the original version
 -   - typos and whitespace
 -   - removed mention of `rel="in-reply-to"` (#97)
+- changed h-entry validation to a validator service
+-   - without making it a validator framework
+-   - the checks in the validator return help and example text as HTML
+-   - Twig now templates the results of that validator
 
-See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration...paultibbetts:indiewebify-me:slim-migration) for all changes.
+See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration...paultibbetts:indiewebify-me:slim-migration) for all changes to the port from Silex to SlimPHP.
+
+See [here](https://github.com/gRegorLove/indiewebify-me/compare/slim-migration...paultibbetts:indiewebify-me:feat/h-entry-validator) for the additional h-entry validator changes.
 
 #### Planned
 
