@@ -285,19 +285,6 @@ class ValidateHEntry
     {
         $content = $this->firstProperty($entry, 'content');
 
-        if ($content === null) {
-            return $this->checkResult(
-                'content',
-                'Content',
-                self::WARNING,
-                'content.missing',
-                help: [
-                    'html' => 'Add some content!',
-                    'example' => '<p class="e-content">…</p>',
-                ],
-            );
-        }
-
         if (is_array($content)) {
             $text = isset($content['value']) && is_scalar($content['value'])
                 ? trim((string) $content['value'])
