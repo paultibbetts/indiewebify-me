@@ -658,19 +658,6 @@ class ValidateHEntry
             return $this->checkResult($id, $childLabel, self::FOUND, 'interaction.url.valid', $this->urlValue($url));
         }
 
-        if (!Mf2Helper\isMicroformat($value)) {
-            return $this->checkResult(
-                $id,
-                $childLabel,
-                self::WARNING,
-                'interaction.target.unrecognized',
-                help: [
-                    'html' => "This {$parentLabel} does not point to a valid URL.",
-                    'example' => sprintf('<div class="u-%s h-cite"><a class="u-url" href="…"></a></div>', $propertyName),
-                ],
-            );
-        }
-
         /** @var array<string, mixed> $value */
         $url = $this->firstPlaintext($value, 'url');
         $children = [];
