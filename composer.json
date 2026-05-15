@@ -33,6 +33,8 @@
 	},
 	"scripts": {
 		"lint": "find config public src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
+		"coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text",
+		"coverage:html": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html coverage",
 		"cs": "php-cs-fixer fix --dry-run --diff --format=txt",
 		"cs:fix": "php-cs-fixer fix",
 		"stan": "phpstan analyse --no-progress",
