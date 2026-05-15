@@ -109,22 +109,14 @@ final readonly class ValidateController
     ) {
         $input_url = $request->getQueryParams()['url'] ?? null;
 
-        if (!$input_url) {
+        if ($input_url === null || trim($input_url) === '') {
             return $this->responder->withTemplate(
                 $response,
                 'validate-rel-me.twig'
             );
         }
 
-        # validate rel-me for URL in query parameter
         $url = UrlNormalizer::normalize($input_url);
-        if ($url === '' || $url === '0') {
-            return $this->responder->withTemplate(
-                $response,
-                'validate-rel-me.twig',
-                ['error' => 'Could not parse the entered URL']
-            );
-        }
 
         if ($input_url !== $url) {
             # ensure normalized URL in query parameter by redirecting
