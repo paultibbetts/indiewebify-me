@@ -242,8 +242,28 @@ final class ValidateHEntryChecksTest extends TestCase
             'published' => ['2026-05-13T11:57:46+01:00'],
         ]), 'published');
 
-        self::assertSame('found', $check['status'], json_encode($check));
+        self::assertSame('found', $check['status']);
         self::assertSame('published.valid', $check['state']);
+    }
+
+    public function testPublishedDateTimeWithUtcDesignator(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'published' => ['2026-05-15T12:34:56Z'],
+        ]), 'published');
+
+        self::assertSame('found', $check['status']);
+        self::assertSame('published.valid', $check['state']);
+    }
+
+    public function testPublishedDateTimeCannotBeInvalidDate()
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'published' => ['2026-99-01T00:00:00+01:00'],
+        ]), 'published');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('published.malformed', $check['state']);
     }
 
     public function testPublishedMalformed(): void
