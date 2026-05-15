@@ -584,7 +584,7 @@ class ValidateHEntry
         $hasWarnings = false;
 
         foreach ($values as $index => $value) {
-            $child = $this->checkInteractionTargetValue($value, $propertyName, $index + 1);
+            $child = $this->checkInteractionTargetValue($value, $propertyName, $label, $index + 1);
 
             if ($child['status'] !== self::FOUND || $child['children'] !== []) {
                 $hasWarnings = true;
@@ -612,6 +612,7 @@ class ValidateHEntry
     private function checkInteractionTargetValue(
         mixed $value,
         string $propertyName,
+        string $parentLabel,
         int $position
     ): array {
         $id = sprintf('%s.%d', $propertyName, $position);
@@ -631,8 +632,8 @@ class ValidateHEntry
                     self::WARNING,
                     'interaction.target.missing-url',
                     help: [
-                        'html' => 'Give the nested microformat a URL property!',
-                        'example' => '<a class="u-url" href="…"></a>',
+                        'html' => "Give this {$parentLabel} a URL value!",
+                        'example' => sprintf('<a class="u-%s" href="…"></a>', $propertyName),
                     ],
                 );
             }
@@ -660,8 +661,8 @@ class ValidateHEntry
                 self::WARNING,
                 'interaction.target.unrecognized',
                 help: [
-                    'html' => 'Give the nested microformat a URL property!',
-                    'example' => '<a class="u-url" href="…"></a>',
+                    'html' => "This {$parentLabel} does not point to a valid URL.",
+                    'example' => sprintf('<div class="u-%s h-cite"><a class="u-url" href="…"></a></div>', $propertyName),
                 ],
             );
         }

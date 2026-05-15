@@ -158,6 +158,7 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('interaction.target.has-warnings', $check['state']);
         self::assertSame('interaction.target.missing-url', $check['children'][0]['state']);
+        self::assertStringContainsString('u-in-reply-to', $check['children'][0]['help']['example']);
     }
 
     public function testReplyTargetUrlMalformed(): void
