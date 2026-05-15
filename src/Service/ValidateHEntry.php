@@ -152,7 +152,7 @@ class ValidateHEntry
             );
         }
 
-        if (!$this->isMicroformat($author)) {
+        if (!Mf2Helper\isMicroformat($author)) {
             return $this->checkResult(
                 'author',
                 'Author',
@@ -655,7 +655,7 @@ class ValidateHEntry
             return $this->checkResult($id, $childLabel, self::FOUND, 'interaction.url.valid', $this->urlValue($url));
         }
 
-        if (!$this->isMicroformat($value)) {
+        if (!Mf2Helper\isMicroformat($value)) {
             return $this->checkResult(
                 $id,
                 $childLabel,
@@ -776,11 +776,6 @@ class ValidateHEntry
         }
 
         return $plaintext;
-    }
-
-    private function isMicroformat(mixed $value): bool
-    {
-        return is_array($value) && Mf2Helper\isMicroformat($value);
     }
 
     /**
