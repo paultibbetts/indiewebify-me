@@ -585,7 +585,7 @@ class ValidateHEntry
         $hasWarnings = false;
 
         foreach ($values as $index => $value) {
-            $child = $this->checkInteractionTargetValue($value, $propertyName, $label, $index + 1);
+            $child = $this->checkInteractionTargetValue($value, $propertyName, $index + 1);
 
             if ($child['status'] !== self::FOUND || $child['children'] !== []) {
                 $hasWarnings = true;
@@ -613,7 +613,6 @@ class ValidateHEntry
     private function checkInteractionTargetValue(
         mixed $value,
         string $propertyName,
-        string $label,
         int $position
     ): array {
         $id = sprintf('%s.%d', $propertyName, $position);
