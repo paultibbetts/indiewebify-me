@@ -52,6 +52,18 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('author.photo.missing', $photo['state']);
     }
 
+    public function testUnrecognisedAuthor(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'author' => [
+                ['unexpected' => 'shape']
+            ]
+        ]), 'author');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('author.unrecognized', $check['state']);
+    }
+
     public function testMissingNameIsNeutral(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry(), 'name');
