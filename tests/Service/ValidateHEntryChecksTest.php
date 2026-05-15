@@ -222,6 +222,50 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('interaction.microformat.has-warnings', $check['children'][0]['state']);
     }
 
+    public function testReplyTargetNestedHCiteMissingUrl(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => [
+                [
+                    'type' => ['h-cite'],
+                    'properties' => [],
+                ],
+            ],
+        ]), 'in-reply-to');
+
+        $target = $this->childFor($check, 'in-reply-to.1');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('interaction.target.has-warnings', $check['state']);
+        self::assertSame('interaction.microformat.has-warnings', $target['state']);
+
+        $url = $this->childFor($target, 'in-reply-to.1.url');
+        self::assertSame('interaction.target.missing-url', $url['state']);
+    }
+
+    public function testReplyTargetNestedHCiteMalformedUrl(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => [
+                [
+                    'type' => ['h-cite'],
+                    'properties' => [
+                        'url' => ['not a url'],
+                    ],
+                ],
+            ],
+        ]), 'in-reply-to');
+
+        $target = $this->childFor($check, 'in-reply-to.1');
+        $url = $this->childFor($target, 'in-reply-to.1.url');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('interaction.target.has-warnings', $check['state']);
+        self::assertSame('interaction.microformat.has-warnings', $target['state']);
+        self::assertSame('interaction.target.malformed-url', $url['state']);
+        self::assertSame('not a url', $url['value']['text']);
+    }
+
     public function testReplyIntentDetectedButNoParsedUrl(): void
     {
         $check = $this->checkFor($this->checksForHtmlEvidence(
