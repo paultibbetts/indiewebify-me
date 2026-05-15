@@ -64,6 +64,24 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('author.unrecognized', $check['state']);
     }
 
+    public function testNestedAuthorMicoformatsNotHCard(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'author' => [
+                [
+                    'type' => 'h-entry',
+                    'properties' => [
+                        'name' => ['Example Person'],
+                        'url' => ['https://example.com/']
+                    ]
+                ]
+            ]
+        ]), 'author');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('author.microformat.not-h-card', $check['state']);
+    }
+
     public function testMissingNameIsNeutral(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry(), 'name');
