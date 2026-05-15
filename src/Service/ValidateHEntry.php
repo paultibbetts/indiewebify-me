@@ -11,6 +11,7 @@ namespace App\Service;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use DateTimeImmutable;
 use DateTimeZone;
+use UnexpectedValueException;
 
 class ValidateHEntry
 {
@@ -658,7 +659,13 @@ class ValidateHEntry
             return $this->checkResult($id, $childLabel, self::FOUND, 'interaction.url.valid', $this->urlValue($url));
         }
 
-        /** @var array<string, mixed> $value */
+        if (!Mf2Helper\isMicroformat($value)) {
+            // This should never happen, but is technically necessary for this validator
+            // because it accepts plain arrays.
+            throw new UnexpectedValueException('Interaction post target must be a URL or nested microformat.');
+        }
+        /** @var array<string, mixed> $value (microformat) */
+
         $url = $this->firstPlaintext($value, 'url');
         $children = [];
 
