@@ -32,7 +32,7 @@ final class ValidateHEntryChecksTest extends TestCase
     public function testCompleteHCardAuthor(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry([
-            'author' => [$this->authorCard(photo: 'https://example.com/photo.jpg')],
+            'author' => [$this->authorCard('Example Person', 'https://example.com/', 'https://example.com/photo.jpg')],
         ]), 'author');
 
         self::assertSame('found', $check['status']);
@@ -40,10 +40,34 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('author-card', $check['value']['type']);
     }
 
-    public function testPartialHCardAuthor(): void
+    public function testPartialHCardAuthorNoName(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry([
-            'author' => [$this->authorCard(photo: null)],
+            'author' => [$this->authorCard(null, 'https://example.com/', 'https://example.com/photo.jpg')],
+        ]), 'author');
+        $name = $this->childFor($check, 'author.name');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('author.h-card.partial', $check['state']);
+        self::assertSame('author.name.missing', $name['state']);
+    }
+
+    public function testPartialHCardAuthorNoUrl(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'author' => [$this->authorCard('Example Person', null, 'https://example.com/photo.jpg')],
+        ]), 'author');
+        $url = $this->childFor($check, 'author.url');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('author.h-card.partial', $check['state']);
+        self::assertSame('author.url.missing', $url['state']);
+    }
+
+    public function testPartialHCardAuthorNoPhoto(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'author' => [$this->authorCard('Example Person', 'https://example.com', null)],
         ]), 'author');
         $photo = $this->childFor($check, 'author.photo');
 
@@ -416,12 +440,17 @@ final class ValidateHEntryChecksTest extends TestCase
      *
      * @return array{type: list<string>, properties: array<string, list<string>>}
      */
-    private function authorCard(?string $photo): array
+    private function authorCard(?string $name, ?string $url, ?string $photo): array
     {
-        $properties = [
-            'name' => ['Example Person'],
-            'url' => ['https://example.com/'],
-        ];
+        $properties = [];
+
+        if ($name !== null) {
+            $properties['name'] = [$name];
+        }
+
+        if ($url !== null) {
+            $properties['url'] = [$url];
+        }
 
         if ($photo !== null) {
             $properties['photo'] = [$photo];
