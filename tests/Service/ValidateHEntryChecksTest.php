@@ -149,6 +149,21 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame([], $check['children']);
     }
 
+    public function testReplyCanTargetMultiplePosts(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => [
+                'https://example.net/postA',
+                'https://example.com/postB',
+            ],
+        ]), 'in-reply-to');
+
+        self::assertSame('found', $check['status']);
+        self::assertSame('interaction.target.valid', $check['state']);
+        self::assertSame('url-list', $check['value']['type']);
+        self::assertSame([], $check['children']);
+    }
+
     public function testReplyTargetUrlMissing(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry([
@@ -170,6 +185,22 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('warning', $check['status']);
         self::assertSame('interaction.target.has-warnings', $check['state']);
         self::assertSame('interaction.target.malformed-url', $check['children'][0]['state']);
+    }
+
+    public function testReplyTargetUrlMalformedSecondTarget(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => [
+                'https://example.net/postA',
+                'postB',
+            ],
+        ]), 'in-reply-to');
+        $child = $this->childFor($check, 'in-reply-to.2');
+
+        self::assertSame('warning', $check['status']);
+        self::assertCount(1, $check['children']);
+        self::assertSame('interaction.target.has-warnings', $check['state']);
+        self::assertSame('interaction.target.malformed-url', $child['state']);
     }
 
     public function testReplyTargetKeepsWarningChildForNestedNonHCite(): void
