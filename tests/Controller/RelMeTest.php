@@ -132,6 +132,41 @@ final class RelMeTest extends WebTestCase
         self::assertTrue($body['secure']);
     }
 
+    public function testRelMePageShowsInsecureRedirectError(): void
+    {
+        $requestedUrl = 'https://example.com/';
+        $finalUrl = 'http://example.com/';
+        $error = "Insecure redirect between {$finalUrl} and {$requestedUrl}";
+
+        $relMe = $this->getMockBuilder(RelMe::class)
+            ->onlyMethods(['documentUrl'])
+            ->getMock();
+        $client = $this->createMock(Client::class);
+
+        $relMe->expects(self::once())
+            ->method('documentUrl')
+            ->with($requestedUrl)
+            ->willReturn([
+                $finalUrl,
+                false,
+                [$requestedUrl],
+            ]);
+
+        $client->expects(self::never())
+            ->method('get');
+
+        $this->container()->set(RelMe::class, $relMe);
+        $this->container()->set(Client::class, $client);
+
+        $response = $this->get('/validate-rel-me/?' . http_build_query([
+            'url' => $requestedUrl,
+        ]));
+        $body = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString($error, $body);
+    }
+
     public function testRelMePageShowsFetchError(): void
     {
         $url = 'https://example.com/';
