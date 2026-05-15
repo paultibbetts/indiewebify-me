@@ -132,4 +132,32 @@ final class HEntryTest extends WebTestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('No h-entry found', $body);
     }
+
+    public function testHEntryPageShowsFetchError(): void
+    {
+        $url = 'https://example.com/';
+        $error = "The site {$url} returned 500 Internal Server Error when we tried to fetch it.";
+
+        $client = $this->createMock(Client::class);
+
+        $client->expects(self::once())
+            ->method('get')
+            ->with($url)
+            ->willReturn([
+                'status' => 500,
+                'body' => '',
+                'error' => $error,
+                'redirects' => [],
+            ]);
+
+        $this->container()->set(Client::class, $client);
+
+        $response = $this->get('/validate-h-entry/?' . http_build_query([
+            'url' => $url,
+        ]));
+        $body = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString($error, $body);
+    }
 }
