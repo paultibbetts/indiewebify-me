@@ -45,6 +45,14 @@ final class PostTypeDiscoveryTest extends TestCase
                 '<div class="e-content">Note</div>',
                 PostType::Note,
             ],
+            'note-name-only' => [
+                '<span class="p-name">content</span>',
+                PostType::Note,
+            ],
+            'note-name-is-start-of-content' => [
+                '<h1 class="p-name">Hello</h1><div class="e-content">Hello, World!</div>',
+                PostType::Note,
+            ],
             'photo' => [
                 '<img class="u-photo" href="https://example.com/img.jpeg">',
                 PostType::Photo,
