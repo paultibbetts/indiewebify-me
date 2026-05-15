@@ -72,6 +72,17 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertNull($check['help']);
     }
 
+    public function testNameLongerThanContentGetsAWarning(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'name' => ['This is a long name'],
+            'content' => ['Content']
+        ]), 'name');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('name.probably-implicit', $check['state']);
+    }
+
     public function testReplyTargetUrlPresent(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry([
