@@ -55,7 +55,6 @@ class ValidateHEntry
             if ($this->hasInteractionEvidence($entry, $html, $check['class'])) {
                 $checks[] = $this->checkInteractionTarget(
                     $entry,
-                    $html,
                     $check['class'],
                     $check['label'],
                 );
@@ -564,34 +563,19 @@ class ValidateHEntry
      */
     private function checkInteractionTarget(
         array $entry,
-        ?string $rawHtml,
         string $propertyName,
         string $label,
     ): array {
         $values = $this->allProperties($entry, $propertyName);
-        $intentDetected = $this->hasClassIntent($rawHtml, 'u-' . $propertyName);
 
         if ($values === []) {
-            if ($intentDetected) {
-                return $this->checkResult(
-                    $propertyName,
-                    $label,
-                    self::WARNING,
-                    'interaction.intent-detected-but-no-parsed-value',
-                    help: [
-                        'html' => "The HTML suggests this is a {$label}, but no value was parsed. Check that the class is on a URL-bearing element.",
-                    ],
-                );
-            }
-
             return $this->checkResult(
                 $propertyName,
                 $label,
                 self::WARNING,
-                'interaction.target.missing',
+                'interaction.intent-detected-but-no-parsed-value',
                 help: [
-                    'html' => 'Give the nested microformat a URL property!',
-                    'example' => '<a class="u-url" href="…"></a>',
+                    'html' => "The HTML suggests this is a {$label}, but no value was parsed. Check that the class is on a URL-bearing element.",
                 ],
             );
         }
