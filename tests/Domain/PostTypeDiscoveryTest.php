@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 final class PostTypeDiscoveryTest extends TestCase
 {
-    #[DataProvider('postTypeHtmlExamples')]
-    public function testDiscoversPostTypesFromHtml(string $html, PostType $expected): void
+    #[DataProvider('hEntryHtmlExamples')]
+    public function testDiscoversHEntryPostTypesFromHtml(string $html, PostType $expected): void
     {
         $hentry = '<article class="h-entry">' . $html . '</article>';
         $microformats = Mf2\parse($hentry, 'https://example.com/');
@@ -30,7 +30,27 @@ final class PostTypeDiscoveryTest extends TestCase
         self::assertSame($expected, $postType);
     }
 
-    public static function postTypeHtmlExamples(): array
+    public function testDiscoversHEventPostTypeFromHtml(): void
+    {
+        $hevent = <<<'HTML'
+        <article class="h-event">
+            <h1 class="p-name">Event name</h1>
+        </article>
+        HTML;
+
+        $microformats = Mf2\parse($hevent, 'https://example.com/');
+        $entries = Mf2Helper\findMicroformatsByType($microformats, 'h-event');
+
+        self::assertCount(1, $entries);
+
+        $discovery = new PostTypeDiscovery(new Microformats());
+
+        $postType = $discovery->discover($entries[0]);
+
+        self::assertSame(PostType::Event, $postType);
+    }
+
+    public static function hEntryHtmlExamples(): array
     {
         return [
             'article' => [
