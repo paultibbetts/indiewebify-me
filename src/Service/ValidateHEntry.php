@@ -24,7 +24,11 @@ class ValidateHEntry
     }
 
     /**
-     * @return array{url: string, found: bool, checks: list<array<string, mixed>>}
+     * @return array{
+     *      url: string,
+     *      found: bool,
+     *      checks: list<array<string, mixed>>
+     *  }
      */
     public function validate(string $url, array $entries, string $html): array
     {

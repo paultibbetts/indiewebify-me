@@ -80,8 +80,8 @@ final class ValidateHEntryChecksTest extends TestCase
     {
         $check = $this->checkFor($this->checksForParsedEntry([
             'author' => [
-                ['unexpected' => 'shape']
-            ]
+                ['unexpected' => 'shape'],
+            ],
         ]), 'author');
 
         self::assertSame('warning', $check['status']);
@@ -96,10 +96,10 @@ final class ValidateHEntryChecksTest extends TestCase
                     'type' => 'h-entry',
                     'properties' => [
                         'name' => ['Example Person'],
-                        'url' => ['https://example.com/']
-                    ]
-                ]
-            ]
+                        'url' => ['https://example.com/'],
+                    ],
+                ],
+            ],
         ]), 'author');
 
         self::assertSame('warning', $check['status']);
@@ -130,7 +130,7 @@ final class ValidateHEntryChecksTest extends TestCase
     {
         $check = $this->checkFor($this->checksForParsedEntry([
             'name' => ['This is a long name'],
-            'content' => ['Content']
+            'content' => ['Content'],
         ]), 'name');
 
         self::assertSame('warning', $check['status']);
