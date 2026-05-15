@@ -149,6 +149,28 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame([], $check['children']);
     }
 
+    public function testReplyTargetUrlMissing(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => ['     '],
+        ]), 'in-reply-to');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('interaction.target.has-warnings', $check['state']);
+        self::assertSame('interaction.target.missing-url', $check['children'][0]['state']);
+    }
+
+    public function testReplyTargetUrlMalformed(): void
+    {
+        $check = $this->checkFor($this->checksForParsedEntry([
+            'in-reply-to' => ['a post'],
+        ]), 'in-reply-to');
+
+        self::assertSame('warning', $check['status']);
+        self::assertSame('interaction.target.has-warnings', $check['state']);
+        self::assertSame('interaction.target.malformed-url', $check['children'][0]['state']);
+    }
+
     public function testReplyTargetKeepsWarningChildForNestedNonHCite(): void
     {
         $check = $this->checkFor($this->checksForParsedEntry([
