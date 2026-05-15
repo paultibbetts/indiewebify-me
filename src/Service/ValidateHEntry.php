@@ -11,7 +11,6 @@ namespace App\Service;
 use BarnabyWalters\Mf2 as Mf2Helper;
 use DateTimeImmutable;
 use DateTimeZone;
-use Exception;
 
 class ValidateHEntry
 {
