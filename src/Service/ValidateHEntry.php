@@ -157,18 +157,12 @@ class ValidateHEntry
         }
 
         if (!Mf2Helper\isMicroformat($author)) {
-            return $this->checkResult(
-                'author',
-                'Author',
-                self::WARNING,
-                'author.unrecognized',
-                help: [
-                    'html' => 'The author value was present, but it was not a readable string or nested microformat.',
-                ],
-            );
+            // This should never happen, but is technically necessary for this validator
+            // because it accepts plain arrays.
+            throw new UnexpectedValueException('Author value was present but it was not a readable string or nested microformat.');
         }
+        /** @var array<string, mixed> $author (microformat) */
 
-        /** @var array<string, mixed> $author */
         $name = $this->firstPlaintext($author, 'name');
         $authorUrl = $this->firstPlaintext($author, 'url');
         $photo = $this->firstPlaintext($author, 'photo');
