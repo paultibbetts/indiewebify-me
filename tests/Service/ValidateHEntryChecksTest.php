@@ -6,6 +6,7 @@ namespace App\Tests\Service;
 
 use App\Service\ValidateHEntry;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 final class ValidateHEntryChecksTest extends TestCase
 {
@@ -76,16 +77,15 @@ final class ValidateHEntryChecksTest extends TestCase
         self::assertSame('author.photo.missing', $photo['state']);
     }
 
-    public function testUnrecognisedAuthor(): void
+    public function testAuthorCheckRequiresValidMicroformatData(): void
     {
-        $check = $this->checkFor($this->checksForParsedEntry([
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->checksForParsedEntry([
             'author' => [
                 ['unexpected' => 'shape'],
             ],
-        ]), 'author');
-
-        self::assertSame('warning', $check['status']);
-        self::assertSame('author.unrecognized', $check['state']);
+        ]);
     }
 
     public function testNestedAuthorMicoformatsNotHCard(): void
@@ -274,6 +274,17 @@ final class ValidateHEntryChecksTest extends TestCase
 
         self::assertSame('warning', $check['status']);
         self::assertSame('interaction.intent-detected-but-no-parsed-value', $check['state']);
+    }
+
+    public function testInteractionCheckRequiresValidMicroformatData(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->checksForParsedEntry([
+            'in-reply-to' => [
+                ['unexpected' => 'shape'],
+            ],
+        ]);
     }
 
     public function testValidRsvpValue(): void
