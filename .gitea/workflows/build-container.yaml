@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: gitea.cloud.paultibbetts.uk
   IMAGE: gitea.cloud.paultibbetts.uk/paul/indiewebify-me
-  IMAGE_PLATFORM: linux/amd64
+  IMAGE_PLATFORMS: linux/amd64,linux/arm64
   GITOPS_REPO: https://gitea.cloud.paultibbetts.uk/paul/homelab.git
 
 jobs:
@@ -62,7 +62,7 @@ jobs:
           echo "Image tags:"
           echo "- ${IMAGE}:${BRANCH_TAG}"
           echo "- ${IMAGE}:${IMMUTABLE_TAG}"
-          echo "Image platform: ${IMAGE_PLATFORM}"
+          echo "Image platforms: ${IMAGE_PLATFORMS}"
           echo "GitOps image reference: ${IMAGE_REF}"
 
       - name: Log in to container registry
@@ -77,7 +77,21 @@ jobs:
             --username "${REGISTRY_USER}" \
             --password-stdin
 
-      - name: Build container image
+      - name: Set up multi-platform builds
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if ! docker buildx version >/dev/null 2>&1; then
+            echo "Docker buildx is required to build the multi-platform image manifest." >&2
+            exit 1
+          fi
+
+          docker run --privileged --rm tonistiigi/binfmt --install amd64,arm64
+          docker buildx create --name indiewebify-builder --use || docker buildx use indiewebify-builder
+          docker buildx inspect --bootstrap
+
+      - name: Build and push container image
         shell: bash
         env:
           BRANCH_TAG: ${{ steps.meta.outputs.branch_tag }}
@@ -88,28 +102,14 @@ jobs:
           echo "Building:"
           echo "- ${IMAGE}:${BRANCH_TAG}"
           echo "- ${IMAGE}:${IMMUTABLE_TAG}"
-          echo "Platform: ${IMAGE_PLATFORM}"
+          echo "Platforms: ${IMAGE_PLATFORMS}"
 
-          docker build \
-            --platform "${IMAGE_PLATFORM}" \
+          docker buildx build \
+            --platform "${IMAGE_PLATFORMS}" \
             --tag "${IMAGE}:${BRANCH_TAG}" \
             --tag "${IMAGE}:${IMMUTABLE_TAG}" \
+            --push \
             .
-
-      - name: Push container image
-        shell: bash
-        env:
-          BRANCH_TAG: ${{ steps.meta.outputs.branch_tag }}
-          IMMUTABLE_TAG: ${{ steps.meta.outputs.immutable_tag }}
-        run: |
-          set -euo pipefail
-
-          echo "Pushing:"
-          echo "- ${IMAGE}:${BRANCH_TAG}"
-          echo "- ${IMAGE}:${IMMUTABLE_TAG}"
-
-          docker push "${IMAGE}:${BRANCH_TAG}"
-          docker push "${IMAGE}:${IMMUTABLE_TAG}"
 
       - name: Inspect pushed image
         shell: bash
