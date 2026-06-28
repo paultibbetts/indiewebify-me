@@ -1,0 +1,115 @@
+name: Build container image
+
+on:
+  push:
+    branches:
+      - slim-migration
+      - feat/h-entry-validator
+
+env:
+  REGISTRY: gitea.cloud.paultibbetts.uk
+  IMAGE: gitea.cloud.paultibbetts.uk/paul/indiewebify-me
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Derive image tags
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BRANCH_NAME="${GITHUB_REF_NAME:-${GITEA_REF_NAME:-}}"
+          if [ -z "${BRANCH_NAME}" ]; then
+            BRANCH_NAME="$(git branch --show-current)"
+          fi
+
+          BRANCH_SLUG="$(
+            printf '%s' "${BRANCH_NAME}" \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed -E 's/[^a-z0-9]+/-/g; s/-+/-/g; s/^-+//; s/-+$//'
+          )"
+
+          if [ -z "${BRANCH_SLUG}" ]; then
+            echo "Unable to derive a non-empty branch slug from '${BRANCH_NAME}'." >&2
+            exit 1
+          fi
+
+          SHORT_SHA="$(git rev-parse --short=12 HEAD)"
+          BRANCH_TAG="${BRANCH_SLUG}"
+          IMMUTABLE_TAG="${BRANCH_SLUG}-${SHORT_SHA}"
+
+          {
+            echo "branch_slug=${BRANCH_SLUG}"
+            echo "short_sha=${SHORT_SHA}"
+            echo "branch_tag=${BRANCH_TAG}"
+            echo "immutable_tag=${IMMUTABLE_TAG}"
+          } >> "${GITHUB_OUTPUT}"
+
+          echo "Branch slug: ${BRANCH_SLUG}"
+          echo "Short SHA: ${SHORT_SHA}"
+          echo "Image tags:"
+          echo "- ${IMAGE}:${BRANCH_TAG}"
+          echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+
+      - name: Log in to container registry
+        shell: bash
+        env:
+          REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "${REGISTRY_TOKEN}" | docker login "${REGISTRY}" \
+            --username "${REGISTRY_USER}" \
+            --password-stdin
+
+      - name: Build container image
+        shell: bash
+        env:
+          BRANCH_TAG: ${{ steps.meta.outputs.branch_tag }}
+          IMMUTABLE_TAG: ${{ steps.meta.outputs.immutable_tag }}
+        run: |
+          set -euo pipefail
+
+          echo "Building:"
+          echo "- ${IMAGE}:${BRANCH_TAG}"
+          echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+
+          docker build \
+            --tag "${IMAGE}:${BRANCH_TAG}" \
+            --tag "${IMAGE}:${IMMUTABLE_TAG}" \
+            .
+
+      - name: Push container image
+        shell: bash
+        env:
+          BRANCH_TAG: ${{ steps.meta.outputs.branch_tag }}
+          IMMUTABLE_TAG: ${{ steps.meta.outputs.immutable_tag }}
+        run: |
+          set -euo pipefail
+
+          echo "Pushing:"
+          echo "- ${IMAGE}:${BRANCH_TAG}"
+          echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+
+          docker push "${IMAGE}:${BRANCH_TAG}"
+          docker push "${IMAGE}:${IMMUTABLE_TAG}"
+
+      - name: Inspect pushed image
+        shell: bash
+        env:
+          IMMUTABLE_TAG: ${{ steps.meta.outputs.immutable_tag }}
+        run: |
+          set -euo pipefail
+
+          if docker buildx version >/dev/null 2>&1; then
+            docker buildx imagetools inspect "${IMAGE}:${IMMUTABLE_TAG}"
+          else
+            echo "Docker buildx is not available on this runner; digest capture can be added when buildx is installed."
+          fi
