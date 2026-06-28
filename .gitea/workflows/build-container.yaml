@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: gitea.cloud.paultibbetts.uk
   IMAGE: gitea.cloud.paultibbetts.uk/paul/indiewebify-me
+  GITOPS_REPO: https://gitea.cloud.paultibbetts.uk/paul/homelab.git
 
 jobs:
   build-and-push:
@@ -43,19 +44,24 @@ jobs:
           SHORT_SHA="$(git rev-parse --short=12 HEAD)"
           BRANCH_TAG="${BRANCH_SLUG}"
           IMMUTABLE_TAG="${BRANCH_SLUG}-${SHORT_SHA}"
+          IMAGE_REF="${IMAGE}:${IMMUTABLE_TAG}"
 
           {
+            echo "branch_name=${BRANCH_NAME}"
             echo "branch_slug=${BRANCH_SLUG}"
             echo "short_sha=${SHORT_SHA}"
             echo "branch_tag=${BRANCH_TAG}"
             echo "immutable_tag=${IMMUTABLE_TAG}"
+            echo "image_ref=${IMAGE_REF}"
           } >> "${GITHUB_OUTPUT}"
 
+          echo "Branch name: ${BRANCH_NAME}"
           echo "Branch slug: ${BRANCH_SLUG}"
           echo "Short SHA: ${SHORT_SHA}"
           echo "Image tags:"
           echo "- ${IMAGE}:${BRANCH_TAG}"
           echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+          echo "GitOps image reference: ${IMAGE_REF}"
 
       - name: Log in to container registry
         shell: bash
@@ -109,7 +115,89 @@ jobs:
           set -euo pipefail
 
           if docker buildx version >/dev/null 2>&1; then
-            docker buildx imagetools inspect "${IMAGE}:${IMMUTABLE_TAG}"
+            if ! docker buildx imagetools inspect "${IMAGE}:${IMMUTABLE_TAG}"; then
+              echo "Unable to inspect pushed image digest; GitOps will use the immutable tag-only image reference."
+            fi
           else
             echo "Docker buildx is not available on this runner; digest capture can be added when buildx is installed."
           fi
+
+      - name: Install yq
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if command -v yq >/dev/null 2>&1; then
+            yq --version
+            exit 0
+          fi
+
+          YQ_DIR="${RUNNER_TEMP:-/tmp}/yq-bin"
+          mkdir -p "${YQ_DIR}"
+
+          if command -v wget >/dev/null 2>&1; then
+            wget -qO "${YQ_DIR}/yq" "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
+          elif command -v curl >/dev/null 2>&1; then
+            curl -fsSL -o "${YQ_DIR}/yq" "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
+          else
+            echo "Neither wget nor curl is available to install yq." >&2
+            exit 1
+          fi
+
+          chmod +x "${YQ_DIR}/yq"
+          echo "${YQ_DIR}" >> "${GITHUB_PATH}"
+
+      - name: Update GitOps deployment
+        shell: bash
+        env:
+          BRANCH_NAME: ${{ steps.meta.outputs.branch_name }}
+          BRANCH_SLUG: ${{ steps.meta.outputs.branch_slug }}
+          SHORT_SHA: ${{ steps.meta.outputs.short_sha }}
+          IMAGE_REF: ${{ steps.meta.outputs.image_ref }}
+          GITOPS_USER: ${{ secrets.GITOPS_USER }}
+          GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          case "${BRANCH_NAME}" in
+            slim-migration)
+              VALUES_FILE="dev/apps/indiewebify-me-slim-migration/values.yaml"
+              ;;
+            feat/h-entry-validator)
+              VALUES_FILE="dev/apps/indiewebify-me-h-entry-validator/values.yaml"
+              ;;
+            *)
+              echo "No GitOps deployment mapping configured for branch: ${BRANCH_NAME}"
+              exit 0
+              ;;
+          esac
+
+          echo "Branch name: ${BRANCH_NAME}"
+          echo "Branch slug: ${BRANCH_SLUG}"
+          echo "Short SHA: ${SHORT_SHA}"
+          echo "GitOps values file: ${VALUES_FILE}"
+          echo "GitOps image reference: ${IMAGE_REF}"
+
+          GITOPS_REPO_PATH="${GITOPS_REPO#https://}"
+          git clone "https://${GITOPS_USER}:${GITOPS_TOKEN}@${GITOPS_REPO_PATH}" homelab
+          cd homelab
+          git checkout main
+
+          if [ ! -f "${VALUES_FILE}" ]; then
+            echo "Expected GitOps values file does not exist: ${VALUES_FILE}" >&2
+            exit 1
+          fi
+
+          yq -i '.["web-app"].image.value = strenv(IMAGE_REF)' "${VALUES_FILE}"
+
+          if git diff --quiet; then
+            echo "No GitOps changes to commit"
+            exit 0
+          fi
+
+          git config user.name "gitea-actions"
+          git config user.email "actions@gitea.cloud.paultibbetts.uk"
+
+          git add "${VALUES_FILE}"
+          git commit -m "Deploy indiewebify-me ${BRANCH_SLUG}-${SHORT_SHA}"
+          git push origin main
