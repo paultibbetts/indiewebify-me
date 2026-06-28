@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: gitea.cloud.paultibbetts.uk
   IMAGE: gitea.cloud.paultibbetts.uk/paul/indiewebify-me
+  IMAGE_PLATFORM: linux/amd64
   GITOPS_REPO: https://gitea.cloud.paultibbetts.uk/paul/homelab.git
 
 jobs:
@@ -61,6 +62,7 @@ jobs:
           echo "Image tags:"
           echo "- ${IMAGE}:${BRANCH_TAG}"
           echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+          echo "Image platform: ${IMAGE_PLATFORM}"
           echo "GitOps image reference: ${IMAGE_REF}"
 
       - name: Log in to container registry
@@ -86,8 +88,10 @@ jobs:
           echo "Building:"
           echo "- ${IMAGE}:${BRANCH_TAG}"
           echo "- ${IMAGE}:${IMMUTABLE_TAG}"
+          echo "Platform: ${IMAGE_PLATFORM}"
 
           docker build \
+            --platform "${IMAGE_PLATFORM}" \
             --tag "${IMAGE}:${BRANCH_TAG}" \
             --tag "${IMAGE}:${IMMUTABLE_TAG}" \
             .
